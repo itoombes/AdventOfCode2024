@@ -14,8 +14,8 @@ def checkSafety(numbers, depth):
     count = len(numbers)
     i = 1
     
-    decreasing = False
     numRemoved = False
+    # Currently just hoping that the first round will never be incorrect
     while (i < count):
         diff = int(numbers[i - 1]) - int(numbers[i])
 
@@ -26,7 +26,6 @@ def checkSafety(numbers, depth):
             attempt1list.pop(i - 1)
             attempt2list = copy.deepcopy(numbers)
             attempt2list.pop(i)
-            print("\t One number invalid - try with removals")
             if checkSafety(attempt1list, 1) or checkSafety(attempt2list, 1):
                 numRemoved = True
             else:
@@ -41,7 +40,6 @@ def checkSafety(numbers, depth):
             attempt1list.pop(i - 1)
             attempt2list = copy.deepcopy(numbers)
             attempt2list.pop(i)
-            print("\t One number invalid - try with removals")
             if checkSafety(attempt1list, 1) or checkSafety(attempt2list, 1):
                 numRemoved = True
             else:
@@ -51,7 +49,6 @@ def checkSafety(numbers, depth):
             attempt1list.pop(i - 1)
             attempt2list = copy.deepcopy(numbers)
             attempt2list.pop(i)
-            print("\t One number invalid - try with removals")
             if checkSafety(attempt1list, 1) or checkSafety(attempt2list, 1):
                 numRemoved = True
             else:
@@ -68,7 +65,7 @@ for line in lines:
     print(f"Processing {numbers}")
     if checkSafety(numbers, 0):
         safeCount += 1
-        print(f"\t Safe : count now {safeCount}")
+        print("\t Safe : count now {safeCount}")
     else:
         print("\t Not Safe")
 
