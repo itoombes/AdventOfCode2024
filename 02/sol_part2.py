@@ -20,15 +20,17 @@ def checkSafety(numbers, depth):
         diff = int(numbers[i - 1]) - int(numbers[i])
 
         if (diff == 0) or (diff < -3) or (diff > 3):
-            if depth == 1 or numRemoved:
+            if depth == 1:
                 return False
             attempt1list = copy.deepcopy(numbers)
             attempt1list.pop(i - 1)
             attempt2list = copy.deepcopy(numbers)
             attempt2list.pop(i)
             print("\t One number invalid - try with removals")
+            print(f"\t{attempt1list}")
+            print(f"\t{attempt2list}")
             if checkSafety(attempt1list, 1) or checkSafety(attempt2list, 1):
-                numRemoved = True
+                return True
             else:
                 return False
 
@@ -37,23 +39,31 @@ def checkSafety(numbers, depth):
             if diff < 0:
                 decreasing = True
         elif diff < 0 and not decreasing:
+            if depth == 1:
+                return False
             attempt1list = copy.deepcopy(numbers)
             attempt1list.pop(i - 1)
             attempt2list = copy.deepcopy(numbers)
             attempt2list.pop(i)
             print("\t One number invalid - try with removals")
+            print(f"\t{attempt1list}")
+            print(f"\t{attempt2list}")
             if checkSafety(attempt1list, 1) or checkSafety(attempt2list, 1):
-                numRemoved = True
+                return True
             else:
                 return False
         elif diff > 0 and decreasing:
+            if depth == 1:
+                return False
             attempt1list = copy.deepcopy(numbers)
             attempt1list.pop(i - 1)
             attempt2list = copy.deepcopy(numbers)
             attempt2list.pop(i)
             print("\t One number invalid - try with removals")
+            print(f"\t{attempt1list}")
+            print(f"\t{attempt2list}")
             if checkSafety(attempt1list, 1) or checkSafety(attempt2list, 1):
-                numRemoved = True
+                return True
             else:
                 return False
         i += 1
