@@ -10,35 +10,31 @@ lines = f.readlines()
 
 for line in lines:
     numbers = line.split(' ')
+    print(f"Processing {numbers}")
 
     decreasing = False
 
     i = 1
     count = len(numbers)
     safe = True
-
     while (i < count) and safe:
         diff = int(numbers[i - 1]) - int(numbers[i])
         
-        # Ensure in range
-        if (diff == 0) or (diff < -2) or (diff > 2):
+        if (diff == 0) or (diff < -3) or (diff > 3):
+            print("\tDifference out of range : not safe")
             safe = False
 
-        # Ensure consistency
-        if diff < 0:
-            if (i == 1):
+        if (i == 1):
+            if diff < 0:
                 decreasing = True
-            elif decreasing:
-                diff *= -1
-            safe = False
-        if (diff > 0) and (i != 1) and decreasing:
+        elif ((diff < 0) and not decreasing) or ((diff > 0) and decreasing):
+            print("\tGradient inconsistent : not safe")
             safe = False
         
-        # If here, then so far valid
         i += 1
 
     if safe:
         safeCount += 1
-        print(f"{line} is safe! | Count is {safeCount}")
-    else:
-        print(f"{line} is not safe")
+        print(f"\t Safe! Current count is {safeCount}")
+
+    print(safeCount)
