@@ -5,7 +5,7 @@ import re
 
 # Extract all multiplication instructions
 f = open("input.txt", "r")
-muls = re.findall("mul\(\d*,\d*\)", f.read())
+muls = re.findall("mul\(\d*,\d*\)|do\(\)|don't\(\)", f.read())
 print(muls)
 
 # Read thru the instructions
@@ -15,7 +15,7 @@ for mul in muls:
     values = mul.split(",")
     x = int(values[0][4:])
     y = int(values[1][:-1])
-    print(f"{x}, {y}")
+    #print(f"{x}, {y}")
     # Add to the total
     total += x * y
-    print(f"\t{total}")
+    #print(f"\t{total}")
