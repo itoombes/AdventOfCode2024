@@ -10,8 +10,8 @@ row_count = len(rows)
 col_count = len(rows[0].replace("\n", ""))
 
 count = 0
-for r, row in enumerate(rows):
-    for ci, c in enumerate(row):
+for ri, row in enumerate(rows):
+    for ci, c in enumerate(row.replace("\n", "")):
         if c == "X":
             # Count the number of 'XMAS'-es
             # Horizontal
@@ -20,29 +20,26 @@ for r, row in enumerate(rows):
             if (ci + 3 < col_count) and (row[ci + 1:ci + 4] == "MAS"):
                 count += 1
             # Upper
-            if r - 3 >= 0:
+            if ri - 3 >= 0:
                 # Upper back diag
-                if (ci - 3 >= 0) and (rows[r - 3][ci - 3] == "S") and (rows[r - 2][ci - 2] == "A") and (rows[r - 1][ci - 1] == "M"):
+                if (ci - 3 >= 0) and (rows[ri - 3][ci - 3] == "S") and (rows[ri - 2][ci - 2] == "A") and (rows[ri - 1][ci - 1] == "M"):
                     count += 1
                 # Upper forwards diag
-                if (ci + 3 < col_count) and (rows[r - 3][ci + 3] == "S") and (rows[r - 2][ci + 2] == "A") and (rows[r - 1][ci + 1] == "M"):
+                if (ci + 3 < col_count) and (rows[ri - 3][ci + 3] == "S") and (rows[ri - 2][ci + 2] == "A") and (rows[ri - 1][ci + 1] == "M"):
                     count += 1
                 # Upper vertical
-                if (rows[r - 3][ci] == "S") and (rows[r - 2][ci] == "A") and (rows[r - 1][ci] == "M"):
+                if (rows[ri - 3][ci] == "S") and (rows[ri - 2][ci] == "A") and (rows[ri - 1][ci] == "M"):
                     count += 1
             # Lower 
-            if r + 3 < row_count:
+            if ri + 3 < row_count:
                 # Lower back diag
-                if (ci - 3 >= 0) and (rows[r + 3][ci - 3] == "S") and (rows[r + 2][ci - 2] == "A") and (rows[r + 1][ci - 1] == "M"):
+                if (ci - 3 >= 0) and (rows[ri + 3][ci - 3] == "S") and (rows[ri + 2][ci - 2] == "A") and (rows[ri + 1][ci - 1] == "M"):
                     count += 1
                 # Lower forwards diag
-                print(row)
-                print(rows[r + 3])
-                print(ci)
-                if (ci + 3 < col_count) and (rows[r + 3][ci + 3] == "S") and (rows[r + 2][ci + 2] == "A") and (rows[r + 1][ci + 1] == "M"):
+                if (ci + 3 < col_count) and (rows[ri + 3][ci + 3] == "S") and (rows[ri + 2][ci + 2] == "A") and (rows[ri + 1][ci + 1] == "M"):
                     count += 1
                 # Lower vertical
-                if (rows[r + 3][ci] == "S") and (rows[r + 2][ci] == "A") and (rows[r + 1][ci] == "M"):
+                if (rows[ri + 3][ci] == "S") and (rows[ri + 2][ci] == "A") and (rows[ri + 1][ci] == "M"):
                     count += 1
 
 print(count)
