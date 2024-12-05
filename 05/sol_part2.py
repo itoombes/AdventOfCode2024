@@ -5,6 +5,7 @@
 f1 = open("input1.txt", "r")
 f2 = open("input2.txt", "r")
 
+import math
 
 # Generate dictionary of pre-requisites for each page
 prereqs = dict()
@@ -34,7 +35,6 @@ for order in f2.readlines():
         i += 1
 
     if outOfOrder:
-        middleIndex = (nPages - 1)//2
         # Want to re-sort these out-of-order lists
         # Assuming all of them CAN be correctly ordered
         i = 0
@@ -47,7 +47,8 @@ for order in f2.readlines():
                     j = nPages - 1
                     while j > i and swapped == False:
                         if pages[j] == prereq:
-                            print(f" Pre-swap : {pages}")
+                            print(pages)
+                            print(f"Page error {pages[j]} | {pages[j]}")
                             swapped = True
                             swp = pages[i]
                             pages[i] = pages[j]
@@ -59,7 +60,9 @@ for order in f2.readlines():
                 i += 1
             else:
                 i = 0
-
-        count += int(pages[middleIndex])
+        print(pages)
+        increment = int(pages[math.floor((nPages - 1)/2)])
+        print(increment)
+        count += increment 
 
 print(count)
