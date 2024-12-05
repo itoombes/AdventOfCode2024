@@ -35,7 +35,7 @@ for order in f2.readlines():
         i += 1
 
     if outOfOrder:
-        print(pages)
+        #print(pages)
         # Generate adjacencies
         adjacency = dict()
         for page in pages:
@@ -46,7 +46,7 @@ for order in f2.readlines():
                 for prereq in prereqs[int(page)]:
                     if prereq in pages:
                         adjacency[prereq].append(page)
-        print(f"\t{adjacency}")
+        #print(f"\t{adjacency}")
         # Generate p-queue
         order = list()
         for page in pages:
@@ -58,12 +58,26 @@ for order in f2.readlines():
         while i < nPages:
             sortedPages.append(heapq.heappop(order)[1])
             i += 1
-        print(f"\t{sortedPages}")
+
+        sortedPages.reverse()
+
+        print(f"{pages}")
+        print(f"\t{adjacency}")
+        print(f"{sortedPages}")
         mid = (nPages - 1) // 2
         print(f"\t{sortedPages[mid]}")
         count += int(sortedPages[mid])
-
-
+        print(f"\t{count}")
+        i = 0
+        while i < nPages:
+            page = int(sortedPages[i])
+            if page in prereqs:
+                for prereq in prereqs[page]:
+                    if prereq in sortedPages[i:-1]:
+                        print("INCORRECT SORT!")
+                        print(f"{prereqs[int(sortedPages[i])]}|{sortedPages[i]})")
+                        ValueError()
+            i += 1
 
 
 print(count)
