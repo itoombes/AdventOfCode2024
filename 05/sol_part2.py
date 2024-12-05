@@ -5,7 +5,7 @@
 f1 = open("input1.txt", "r")
 f2 = open("input2.txt", "r")
 
-import math
+import heapq
 
 # Generate dictionary of pre-requisites for each page
 prereqs = dict()
@@ -35,34 +35,35 @@ for order in f2.readlines():
         i += 1
 
     if outOfOrder:
-        # Want to re-sort these out-of-order lists
-        # Assuming all of them CAN be correctly ordered
-        i = 0
-        print(nPages)
-        while i < nPages:
-            swapped = False
-            if int(pages[i]) in prereqs:
-                # Go thru each prereq - if match found, swap last pre-req and value
-                for prereq in prereqs[int(pages[i])]:
-                    j = nPages - 1
-                    while j > i and swapped == False:
-                        if pages[j] == prereq:
-                            print(pages)
-                            print(f"Page error {pages[j]} | {pages[j]}")
-                            swapped = True
-                            swp = pages[i]
-                            pages[i] = pages[j]
-                            pages[j] = swp
-                            print(f"Post-swap : {pages}")
-                            break
-                        j -= 1
-            if not swapped:
-                i += 1
-            else:
-                i = 0
         print(pages)
-        increment = int(pages[math.floor((nPages - 1)/2)])
-        print(increment)
-        count += increment 
+        # Generate adjacencies
+        adjacency = dict()
+        for page in pages:
+            adjacency[page] = list()
+        # Go thru each page and establish how many pages are adjacent
+        for page in pages:
+            if int(page) in prereqs:
+                for prereq in prereqs[int(page)]:
+                    if prereq in pages:
+                        adjacency[prereq].append(page)
+        print(f"\t{adjacency}")
+        # Generate p-queue
+        order = list()
+        for page in pages:
+            heapq.heappush(order, (len(adjacency[page]), page))
+        
+        # Sort the list
+        sortedPages = list()
+        i = 0
+        while i < nPages:
+            sortedPages.append(heapq.heappop(order)[1])
+            i += 1
+        print(f"\t{sortedPages}")
+        mid = (nPages - 1) // 2
+        print(f"\t{sortedPages[mid]}")
+        count += int(sortedPages[mid])
+
+
+
 
 print(count)
