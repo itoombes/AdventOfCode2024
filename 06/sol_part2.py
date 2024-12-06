@@ -5,7 +5,7 @@ import copy
 
 def parse_map():
     world = list()
-    f = open("input.txt", "r")
+    f = open("dummyinput.txt", "r")
     guardRow = 0
     guardCol = 0
     for i, line in enumerate(f.readlines()):
