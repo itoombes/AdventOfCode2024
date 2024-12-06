@@ -9,7 +9,6 @@ def parse_map():
     guardRow = 0
     guardCol = 0
     for i, line in enumerate(f.readlines()):
-        line.replace("\n", "")
         if "^" in line:
             guardRow = i
             strLen = len(line)
@@ -19,7 +18,7 @@ def parse_map():
                     guardCol = j
                     break
                 j += 1
-        world.append(line)
+        world.append(line[:-1])
     return (world, guardRow, guardCol)
 
 def main():
@@ -31,6 +30,7 @@ def main():
     nRows = len(world)
     nCols = len(world[0])
 
+    print(world)
     # Parse thru the valid locations to place an obstacle in the first place
     while True:
         if orientation == "up":
@@ -68,6 +68,7 @@ def main():
     # Now, iterate thru the 
     placements = copy.deepcopy(visited)
 
+    print(nCols)
     count = 0
     for placement in placements:
         # Skip placing at the initial guard point
@@ -80,7 +81,7 @@ def main():
         visited = [(initRow, initCol, "up"),]
         while True:
             if orientation == "up":
-                if world[row - 1][col] == "#":
+                if newWorld[row - 1][col] == "#":
                     orientation = "right"
                 else:
                     row -= 1
@@ -90,7 +91,9 @@ def main():
                         count += 1
                         break
             if orientation == "right":
-                if world[row][col + 1] == "#":
+                print(newWorld[row])
+                print(col)
+                if newWorld[row][col + 1] == "#":
                     orientation = "down"
                 else:
                     col += 1
@@ -100,7 +103,7 @@ def main():
                         count += 1
                         break
             if orientation == "down":
-                if world[row + 1][col] == "#":
+                if newWorld[row + 1][col] == "#":
                     orientation = "left"
                 else:
                     row += 1
@@ -110,7 +113,7 @@ def main():
                         count += 1
                         break
             if orientation == "left":
-                if world[row][col - 1] == "#":
+                if newWorld[row][col - 1] == "#":
                     orientation = "up"
                 else:
                     col -= 1
