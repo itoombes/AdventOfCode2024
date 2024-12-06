@@ -30,14 +30,27 @@ def parse_orders():
         orders.append(order)
     return orders
 
-
+def ordered(order, rules):
+    i = 0
+    nPages = len(order)
+    while i < nPages:
+        if order[i] in rules:
+            for prereq in rules[order[i]]:
+                if prereq in order[i:-1]:
+                    return False
+        i += 1
+    return True
 
 def main():
     rules = parse_rules()
     printOrders = parse_orders()
 
-    print(rules)
-    print(printOrders)
+    result = 0
+    for order in printOrders:
+        if ordered(order, rules):
+            result += order[(len(order) - 1) // 2]
+
+    print(result)
 
 if __name__ == "__main__":
     main()
