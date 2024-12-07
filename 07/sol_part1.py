@@ -2,7 +2,7 @@
 # Day 7
 
 def parse_input():
-    if True:
+    if False:
         f = open("dummyInput.txt", "r")
     else:
         f = open("input.txt", "r")
@@ -18,15 +18,6 @@ def parse_input():
 
 def is_possible(equation):
     print(f"Validate {equation}")
-    # Ensure possible to reach at all
-    initValue = equation[1][0]
-    totalPossible = initValue
-    for i in range(1, len(equation[1])):
-        totalPossible *= equation[1][i]
-    if totalPossible < equation[0]:
-        print("\tImpossible to reach")
-        return False
-
     # Iterate thru each possible operation comparison
     ops = [0] * (len(equation[1]) - 1)
     while True:
@@ -40,11 +31,10 @@ def is_possible(equation):
             # Skip results when already over total
             if currentTotal > equation[0]:
                 break
-        if currentTotal == equation[0]:
-            print(f"\t{currentTotal} == {equation[0]}")
-            return True
-        else:
-            print(f"\t{currentTotal} is not equal")
+            if currentTotal == equation[0] and i == len(equation[1]) - 1:
+                print(f"\tValid : {ops}")
+                return True
+            print(f"\tInvalid : {currentTotal}")
 
         # Iterate to next variant
         i = 0
@@ -55,7 +45,7 @@ def is_possible(equation):
                     ops[j] = 0
                 break
             i += 1
-            # If here, have no values that will fit
+            # If here, have no values that will             
             if i == len(ops):
                 print("\tNo valid values")
                 return False
@@ -67,7 +57,7 @@ def main():
     for equation in equations:
         if is_possible(equation):
             count += equation[0]
-            print(count)
+            print(f"\t{count}")
     print(count)
 
 if __name__ == "__main__":
