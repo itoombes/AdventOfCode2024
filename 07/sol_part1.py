@@ -2,7 +2,10 @@
 # Day 7
 
 def parse_input():
-    f = open("input.txt", "r")
+    if True:
+        f = open("dummyInput.txt", "r")
+    else:
+        f = open("input.txt", "r")
     equations = list()
     for line in f.readlines():
         line = line.split(":")
@@ -27,7 +30,22 @@ def is_possible(equation):
     # Iterate thru each possible operation comparison
     ops = [0] * (len(equation[1]) - 1)
     while True:
-        
+        currentTotal = equation[1][0]
+        # Go through variant
+        for i in range(1, len(equation[1])):
+            if ops[i - 1] == 1:
+                currentTotal += equation[1][i]
+            else:
+                currentTotal *= equation[1][i]
+            # Skip results when already over total
+            if currentTotal > equation[0]:
+                break
+        if currentTotal == equation[0]:
+            print(f"\t{currentTotal} == {equation[0]}")
+            return True
+        else:
+            print(f"\t{currentTotal} is not equal")
+
         # Iterate to next variant
         i = 0
         while True: 
@@ -49,6 +67,7 @@ def main():
     for equation in equations:
         if is_possible(equation):
             count += equation[0]
+            print(count)
     print(count)
 
 if __name__ == "__main__":
