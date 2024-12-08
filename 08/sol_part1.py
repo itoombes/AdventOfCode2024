@@ -14,9 +14,9 @@ def parse_map():
             char = line[c]
             if char != '.':
                 if char in freqs:
-                    freqs[char].append((r, c))
+                    freqs[char].append((c, r))
                 else:
-                    freqs[char] = [(r, c),]
+                    freqs[char] = [(c, r),]
     return (nRows, nCols, freqs)
 
 def locate_antinodes(nRows, nCols, antennae):
@@ -33,10 +33,11 @@ def locate_antinodes(nRows, nCols, antennae):
             y2 = antennae[i][1] - dy
             print(f"\t\t({x1},{y1}), ({x2}, {y2})")
             
-            if (x1 >= 0) and (x1 <= nCols) and (y1 >= 0) and (y1 <= nRows):
+            if (x1 >= 0) and (x1 <= nCols - 1) and (y1 >= 0) and (y1 <= nRows - 1):
                 candidates.append((x1, y1))
-            if (x2 >= 0) and (x2 <= nCols) and (y2 >= 0) and (y2 <= nRows):
+            if (x2 >= 0) and (x2 <= nCols - 1) and (y2 >= 0) and (y2 <= nRows - 1):
                 candidates.append((x2, y2))
+    print(f"\t{candidates}")
     return candidates
 
 def main():
