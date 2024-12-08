@@ -1,8 +1,10 @@
 # itoombes, Advent of Code 2024
 # Day 8
 
+import math
+
 def parse_map():
-    grid = open("dummyinput.txt", "r").readlines()
+    grid = open("input.txt", "r").readlines()
     # Get grid
     nRows = len(grid)
     nCols = len(grid[0]) - 1
@@ -25,6 +27,7 @@ def locate_antinodes(nRows, nCols, antennae):
     for i in range(0, len(antennae) - 1):
         for j in range(i + 1, len(antennae)):
             print(f"\t{antennae[i]}, {antennae[j]}")
+            # Extract point with lowest 'x', get dx and dy
             if antennae[i][0] < antennae[j][0]:
                 initX = antennae[i][0]
                 initY = antennae[i][1]
@@ -35,8 +38,32 @@ def locate_antinodes(nRows, nCols, antennae):
                 initY = antennae[j][1]
                 dx = antennae[i][0] - initX
                 dy = antennae[i][1] - initY
+            divisor = math.gcd(dx, dy)
+            dx = dx // divisor
+            dy = dy // divisor
+            print(f"\t\t({initX}, {initY}), dx : {dx}, dy : {dy}")
+            # Add every candidate with lower x
+            k = 0
+            x = initX
+            y = initY
+            while True:
+                x -= dx * k
+                y -= dy * k
+                if (x < 0) or (y < 0) or (y >= nRows):
+                    break
+                candidates.append((x, y))
+                k += 1
+            k = 0
+            x = initX
+            y = initY
+            while True:
+                x += dx * k
+                y += dy * k
+                if (x >= nCols) or (y < 0) or (y >= nRows):
+                    break
+                candidates.append((x, y))
+                k += 1
 
-            print(f"\t({initX}, {initY}), dx : {dx}, dy : {dy}")
     print(f"\t{candidates}")
     return candidates
 
