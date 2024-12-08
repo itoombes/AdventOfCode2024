@@ -25,44 +25,18 @@ def locate_antinodes(nRows, nCols, antennae):
     for i in range(0, len(antennae) - 1):
         for j in range(i + 1, len(antennae)):
             print(f"\t{antennae[i]}, {antennae[j]}")
-            dx = antennae[j][0] - antennae[i][0]
-            dy = antennae[j][1] - antennae[i][1]
-            xmin = antennae[i][0]
-            xmax = antennae[j][0]
-            if dx < 0:
-                xmin = antennae[j][0]
-                xmax = antennae[i][0]
-                dx *= -1
-            ymin = antennae[i][1]
-            ymax = antennae[j][1]
-            if dy < 0:
-                ymin = antennae[j][1]
-                ymax = antennae[i][1]
-                dy *= -1
+            if antennae[i][0] < antennae[j][0]:
+                initX = antennae[i][0]
+                initY = antennae[i][1]
+                dx = antennae[j][0] - initX
+                dy = antennae[j][1] - initY
+            else:
+                initX = antennae[j][0]
+                initY = antennae[j][1]
+                dx = antennae[i][0] - initX
+                dy = antennae[i][1] - initY
 
-            # Now, add every potential candidate position
-            # Go backward
-            x = xmin
-            y = ymin
-            k = 0
-            while True:
-                x -= dx * k
-                y -= dy * k
-                if (x < 0) or (y < 0):
-                    break
-                candidates.append((x, y))
-                k += 1
-            x = xmax
-            y = ymax
-            k = 0
-            while True: 
-                x += dx * k
-                y += dy * k
-                if (x >= nCols) or (y >= nRows):
-                    break
-                candidates.append((x, y))
-                k += 1
-
+            print(f"\t({initX}, {initY}), dx : {dx}, dy : {dy}")
     print(f"\t{candidates}")
     return candidates
 
