@@ -43,26 +43,23 @@ def locate_antinodes(nRows, nCols, antennae):
             dy = dy // divisor
             print(f"\t\t({initX}, {initY}), dx : {dx}, dy : {dy}")
             # Add every candidate with lower x
-            k = 0
             x = initX
             y = initY
+            candidates.append((x, y))
             while True:
-                x -= dx * k
-                y -= dy * k
+                x -= dx
+                y -= dy
                 if (x < 0) or (y < 0) or (y >= nRows):
                     break
                 candidates.append((x, y))
-                k += 1
-            k = 0
             x = initX
             y = initY
             while True:
-                x += dx * k
-                y += dy * k
+                x += dx
+                y += dy
                 if (x >= nCols) or (y < 0) or (y >= nRows):
                     break
                 candidates.append((x, y))
-                k += 1
 
     print(f"\t{candidates}")
     return candidates
