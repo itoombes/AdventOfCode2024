@@ -2,7 +2,7 @@
 # Day 8
 
 def parse_map():
-    grid = open("dummyinput2.txt", "r").readlines()
+    grid = open("dummyinput.txt", "r").readlines()
     # Get grid
     nRows = len(grid)
     nCols = len(grid[0]) - 1
@@ -40,10 +40,29 @@ def locate_antinodes(nRows, nCols, antennae):
                 ymax = antennae[i][1]
                 dy *= -1
 
-            for x in range(xmin - dx, xmax + dx + 1):
-                for y in range(ymin - dy, ymax + dy + 1):
-                    if (x >= 0) and (y >= 0) and (x < nCols) and (y < nRows):
-                        candidates.append((x, y))
+            # Now, add every potential candidate position
+            # Go backward
+            x = xmin
+            y = ymin
+            k = 0
+            while True:
+                x -= dx * k
+                y -= dy * k
+                if (x < 0) or (y < 0):
+                    break
+                candidates.append((x, y))
+                k += 1
+            x = xmax
+            y = ymax
+            k = 0
+            while True: 
+                x += dx * k
+                y += dy * k
+                if (x >= nCols) or (y >= nRows):
+                    break
+                candidates.append((x, y))
+                k += 1
+
     print(f"\t{candidates}")
     return candidates
 
