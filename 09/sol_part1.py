@@ -1,7 +1,18 @@
 # itoombes, Advent of Code 2024
 # Day 9
 
+import copy
+
 INPUT = "dummyinput.txt"
+
+def print_data(data):
+    string = ""
+    for c in data:
+        if c is not None:
+            string += str(c)
+        else:
+            string += ('.')
+    print(string)
 
 def open_dm(file):
     f = open(file)
@@ -21,19 +32,36 @@ def parse_to_array(diskmap):
                 data.append(None)
     return data
 
-def print_data(data):
-    string = ""
-    for c in data:
-        if c is not None:
-            string += str(c)
-        else:
-            string += ('.')
-    print(string)
+def compress(inputData):
+    data = copy.deepcopy(inputData)
+
+    iF = 0
+    iB = len(data) - 1
+
+    while iF < iB:
+        # Ensure iF and iB are at valid locations
+        if data[iF] is not None:
+            iF += 1
+            continue
+        if data[iB] is None:
+            data.pop(iB)
+            iB -= 1
+            continue
+                
+        # Front pointer at free space
+        # Back pointer at not free
+        # Copy across
+        data[iF] = data.pop(iB)
+        iB -= 1
+        print_data(data)
+
+    return data
 
 def main():
     diskmap = open_dm(INPUT)
     initData = parse_to_array(diskmap)
     print_data(initData)
+    compData = compress(initData)
 
 if __name__ == "__main__":
     main()
