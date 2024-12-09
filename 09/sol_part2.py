@@ -1,6 +1,8 @@
 # itoombes, Advent of Code 2024
 # Day 9
 
+import copy
+
 INPUT = "dummyinput.txt"
 
 def print_data(data):
@@ -35,6 +37,7 @@ def parse_diskmap(diskmap):
     return (data, fileSizes)
 
 def compress(data, fileSizes):
+    ogData = copy.deepcopy(data)
     iF = 0
     iB = len(data) - 1
 
@@ -43,13 +46,13 @@ def compress(data, fileSizes):
             data.pop(iB)
             iB -= 1
             continue
-        if data[iF] is not None:
+        if ogData[iF] is not None:
             iF += 1
             continue
         # Check the amount of free space
         freeIndex = iF
         freeSpace = 0
-        while data[freeIndex] is None:
+        while ogData[freeIndex] is None:
             freeSpace += 1
             freeIndex += 1
         # Find the smallest block that fits, starting from the minimum
@@ -64,10 +67,6 @@ def compress(data, fileSizes):
         # If can copy anything, does so
         print(f"Copy to {iF}, copy from {copyIndex}, copy length {copyLen}")
         input("")
-        # Break out of loops
-        if copyIndex == iF:
-            while iF < len(data) and data[iF] is None:
-                iF += 1
         while copyLen > 0:
             data[iF] = data[copyIndex]
             data[copyIndex] = None
@@ -75,6 +74,9 @@ def compress(data, fileSizes):
             copyIndex -= 1
             copyLen -= 1
             print_data(data)
+        # Move iF to the next block
+        while iF < len(data) and ogData[iF] is None:
+            iF += 1
 
     return data
 
