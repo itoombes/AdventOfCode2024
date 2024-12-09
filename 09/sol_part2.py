@@ -1,8 +1,6 @@
 # itoombes, Advent of Code 2024
 # Day 9
 
-import copy
-
 INPUT = "dummyinput.txt"
 
 def print_data(data):
@@ -36,9 +34,49 @@ def parse_diskmap(diskmap):
                 data.append(None)
     return (data, fileSizes)
 
-def compress(inputData):
-    data = copy.deepcopy(inputData)
-    pass
+def compress(data, fileSizes):
+    iF = 0
+    iB = len(data) - 1
+
+    while iF < iB:
+        if data[iB] is None:
+            data.pop(iB)
+            iB -= 1
+            continue
+        if data[iF] is not None:
+            iF += 1
+            continue
+        # Check the amount of free space
+        freeIndex = iF
+        freeSpace = 0
+        while data[freeIndex] is None:
+            freeSpace += 1
+            freeIndex += 1
+        # Find the smallest block that fits, starting from the minimum
+        copyIndex = iB
+        copyLen = 0
+        while copyIndex > iF:
+            if data[copyIndex] is None or fileSizes[data[copyIndex]] > freeSpace:
+                copyIndex -= 1
+                continue
+            copyLen = fileSizes[data[copyIndex]]
+            break
+        # If can copy anything, does so
+        print(f"Copy to {iF}, copy from {copyIndex}, copy length {copyLen}")
+        input("")
+        # Break out of loops
+        if copyIndex == iF:
+            while iF < len(data) and data[iF] is None:
+                iF += 1
+        while copyLen > 0:
+            data[iF] = data[copyIndex]
+            data[copyIndex] = None
+            iF += 1
+            copyIndex -= 1
+            copyLen -= 1
+            print_data(data)
+
+    return data
 
 def checksum(data):
     chksum = 0
@@ -52,6 +90,8 @@ def main():
     data, fileSizes = parse_diskmap(diskmap)
     print_data(data)
     print(fileSizes)
+    data = compress(data, fileSizes)
+    print(checksum(data))
 
 if __name__ == "__main__":
     main()
