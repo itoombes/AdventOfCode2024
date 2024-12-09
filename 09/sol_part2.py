@@ -3,7 +3,7 @@
 
 import copy
 
-INPUT = "dummyinput.txt"
+INPUT = "input.txt"
 
 def print_data(data):
     string = ""
@@ -19,64 +19,59 @@ def open_dm(file):
     content = f.read().replace("\n", "")
     return content
 
-def parse_diskmap(diskmap):
+def parse_to_array(diskmap):
     data = list()
-    fileNo = 0
-    fileSizes = dict()
+    block = 0
     for i in range(0, len(diskmap)):
         if i % 2 == 0:
-            fileSize = 0
             for i in range(0, int(diskmap[i])):
-                data.append(fileNo)
-                fileSize += 1
-            fileSizes[fileNo] = fileSize 
-            fileNo += 1
+                data.append(block)
+            block += 1
         else:
             for i in range(0, int(diskmap[i])):
                 data.append(None)
-    return (data, fileSizes)
+    return (data, block - 1)
 
-def compress(data, fileSizes):
-    ogData = copy.deepcopy(data)
-    iF = 0
-    iB = len(data) - 1
-
-    while iF < iB:
-        if data[iB] is None:
-            data.pop(iB)
+def compress(inputData, noFiles):
+    data = copy.deepcopy(inputData)
+    f = noFiles
+ 
+    # For each file above 0
+    while f > 0:
+        print(f"File {f}...")
+        # Set back pointer to the end of the correct file
+        iB = len(data) - 1
+        while iB > 0 and data[iB] != f:
             iB -= 1
-            continue
-        if ogData[iF] is not None:
-            iF += 1
-            continue
-        # Check the amount of free space
-        freeIndex = iF
+
+        # Now, find the amount of space required by the file
+        sizeIndex = iB
+        size = 0
+        while sizeIndex > 0 and data[sizeIndex] == f:
+            sizeIndex -= 1
+            size += 1
+        # Now, find the starting index of the correct amount of free space, if exists
         freeSpace = 0
-        while ogData[freeIndex] is None:
-            freeSpace += 1
-            freeIndex += 1
-        # Find the smallest block that fits, starting from the minimum
-        copyIndex = iB
-        copyLen = 0
-        while copyIndex > iF:
-            if data[copyIndex] is None or fileSizes[data[copyIndex]] > freeSpace:
-                copyIndex -= 1
-                continue
-            copyLen = fileSizes[data[copyIndex]]
-            break
-        # If can copy anything, does so
-        print(f"Copy to {iF}, copy from {copyIndex}, copy length {copyLen}")
-        input("")
-        while copyLen > 0:
-            data[iF] = data[copyIndex]
-            data[copyIndex] = None
+        iF = 0
+        while iF < sizeIndex:
+            if data[iF] is None:
+                freeSpace += 1
+            else:
+                freeSpace = 0
+            if freeSpace == size:
+                break
             iF += 1
-            copyIndex -= 1
-            copyLen -= 1
-            print_data(data)
-        # Move iF to the next block
-        while iF < len(data) and ogData[iF] is None:
-            iF += 1
+        #print(f"f: {f}; iF : {iF}; iB : {iB}; size : {size}, space : {freeSpace}")
+        while freeSpace > 0:
+            data[iF] = data[iB]
+            data[iB] = None
+            iF -= 1
+            iB -= 1
+            freeSpace -= 1
+            #print_data(data)
+        #input()
+        # go onto the next file
+        f -= 1
 
     return data
 
@@ -89,11 +84,10 @@ def checksum(data):
 
 def main():
     diskmap = open_dm(INPUT)
-    data, fileSizes = parse_diskmap(diskmap)
-    print_data(data)
-    print(fileSizes)
-    data = compress(data, fileSizes)
-    print(checksum(data))
+    initData, noFiles = parse_to_array(diskmap)
+    #print_data(initData)
+    compData = compress(initData, noFiles)
+    print(checksum(compData))
 
 if __name__ == "__main__":
     main()
