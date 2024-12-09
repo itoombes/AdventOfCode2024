@@ -3,7 +3,7 @@
 
 import copy
 
-INPUT = "dummyinput.txt"
+INPUT = "input.txt"
 
 def print_data(data):
     string = ""
@@ -53,15 +53,22 @@ def compress(inputData):
         # Copy across
         data[iF] = data.pop(iB)
         iB -= 1
-        print_data(data)
+        #print_data(data)
 
     return data
+
+def checksum(data):
+    chksum = 0
+    for i, d in enumerate(data):
+        chksum += d * i
+    return chksum
 
 def main():
     diskmap = open_dm(INPUT)
     initData = parse_to_array(diskmap)
-    print_data(initData)
+    #print_data(initData)
     compData = compress(initData)
+    print(checksum(compData))
 
 if __name__ == "__main__":
     main()
