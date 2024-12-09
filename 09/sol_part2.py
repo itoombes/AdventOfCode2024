@@ -37,40 +37,42 @@ def compress(inputData, noFiles):
     f = noFiles
  
     # For each file above 0
-    while f > 0:
+    while f >= 0:
         print(f"File {f}...")
-        # Set back pointer to the end of the correct file
-        iB = len(data) - 1
-        while iB > 0 and data[iB] != f:
-            iB -= 1
-
-        # Now, find the amount of space required by the file
-        sizeIndex = iB
-        size = 0
-        while sizeIndex > 0 and data[sizeIndex] == f:
-            sizeIndex -= 1
-            size += 1
-        # Now, find the starting index of the correct amount of free space, if exists
-        freeSpace = 0
-        iF = 0
-        while iF < sizeIndex:
-            if data[iF] is None:
-                freeSpace += 1
+        # Find the start of the file block
+        iB = 0
+        while data[iB] != f:
+            iB += 1
+        # Determine the size of the block
+        iS = iB
+        fileSize = 0
+        while iS < len(data) and data[iS] == f:
+            fileSize += 1
+            iS += 1
+        # Find the next free block on the LHS
+        iF = -1
+        iS = 0
+        freeSize = 0
+        while iS < iB:
+            if data[iS] is not None:
+                freeSize = 0
             else:
-                freeSpace = 0
-            if freeSpace == size:
+                freeSize += 1
+            if freeSize == fileSize:
+                iF = iS - freeSize + 1
                 break
-            iF += 1
-        #print(f"f: {f}; iF : {iF}; iB : {iB}; size : {size}, space : {freeSpace}")
-        while freeSpace > 0:
-            data[iF] = data[iB]
-            data[iB] = None
-            iF -= 1
-            iB -= 1
-            freeSpace -= 1
-            #print_data(data)
+            iS += 1
+        # Copy the data
+        if iF > -1:
+            while fileSize > 0:
+                data[iF] = data[iB]
+                data[iB] = None
+                iF += 1
+                iB += 1
+                fileSize -= 1
+        #print_data(data)
         #input()
-        # go onto the next file
+
         f -= 1
 
     return data
@@ -85,7 +87,7 @@ def checksum(data):
 def main():
     diskmap = open_dm(INPUT)
     initData, noFiles = parse_to_array(diskmap)
-    #print_data(initData)
+    print_data(initData)
     compData = compress(initData, noFiles)
     print(checksum(compData))
 
