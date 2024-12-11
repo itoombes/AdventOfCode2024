@@ -3,7 +3,7 @@
 
 DUMMY = "dummyinput.txt"
 INPUT = "input.txt"
-N_ITERATIONS = 6
+N_ITERATIONS = 25 
 
 def parse_input(file):
     f = open(file, "r")
@@ -16,7 +16,6 @@ def parse_input(file):
 def apply_rules(stones):
     i = 0
     while i < len(stones):
-        print(stones[i])
         # Apply rule 1 - if stone is 0
         if stones[i] == 0:
             stones[i] = 1
@@ -28,7 +27,9 @@ def apply_rules(stones):
         if digitCount % 2 == 0:
             lStone = int(strStone[0:digitCount // 2])
             rStone = int(strStone[(digitCount // 2):])
-            stones = stones[0:i - 1] + [lStone, rStone] + stones[i + 1:]
+            leftStones = stones[:i]
+            rightStones = stones[i + 1:]
+            stones = leftStones + [lStone, rStone] + rightStones
             i += 2
             continue
         # Apply rule 3
@@ -37,11 +38,12 @@ def apply_rules(stones):
     return stones
 
 def main():
-    stones = parse_input(DUMMY)
+    stones = parse_input(INPUT)
     print(stones)
     for i in range(0, N_ITERATIONS):
+        print(f"Iteration {i + 1}...")
         stones = apply_rules(stones)
-        print(stones)
+        #print(stones)
     print(len(stones))
 
 
