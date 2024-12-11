@@ -3,7 +3,7 @@
 
 import functools
 
-N_ITERATIONS = 75
+N_ITERATIONS = 25
 
 def parse_input():
     f = open("input.txt", "r")
