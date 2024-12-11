@@ -3,7 +3,7 @@
 
 import functools
 
-N_ITERATIONS = 25 
+N_ITERATIONS = 25
 
 def parse_input():
     f = open("input.txt", "r")
@@ -16,21 +16,20 @@ def parse_input():
 @functools.cache
 def apply_rules(stone):
     if stone == 0:
-        return [1]
+        return 1
     if len(str(stone)) % 2 == 0:
         stone = str(stone)
         return [int(stone[:len(stone) //2]), int(stone[len(stone) // 2:])]
-    return [stone * 2024]
+    return stone * 2024
 
+@functools.cache
 def count_result(depth, stone):
-    count = 0
     for i in range(depth, N_ITERATIONS):
-        result = apply_rules(stone)
-        if len(result) == 1:
-            stone = result[0]
+        stone = apply_rules(stone)
+        if type(stone) is int:
             continue
-        count += count_result(i, result[0])
-        count += count_result(i, result[1])
+        count = count_result(i, stone[0])
+        count += count_result(i, stone[1])
         return count
     return 1
 
@@ -39,8 +38,11 @@ def main():
     count = 0
     for stone in stones:
         print(stone)
-        count += count_result(0, stone)
-    print(len(stones))
+        res = count_result(0, stone)
+        print(f"\t{res}")
+        count += res
+        print(f"\t{count}")
+    print(count)
 
 
 if __name__ == "__main__":
