@@ -85,6 +85,7 @@ def extract_sides(farm, perimeter):
         while (r, nC) in up:
             up.remove((r, nC))
             nC += 1
+            i = 0
         i += 1
     i = 0
     while i < len(down):
@@ -93,6 +94,7 @@ def extract_sides(farm, perimeter):
         while (r, nC) in down:
             down.remove((r, nC))
             nC += 1
+            i = 0
         i += 1
     i = 0
     while i < len(left):
@@ -101,6 +103,7 @@ def extract_sides(farm, perimeter):
         while (nR, c) in left:
             left.remove((nR, c))
             nR += 1
+            i = 0
         i += 1
     i = 0
     while i < len(right):
@@ -109,6 +112,7 @@ def extract_sides(farm, perimeter):
         while (nR, c) in right:
             right.remove((nR, c))
             nR += 1
+            i = 0
         i += 1
     nSides = len(up) + len(down) + len(left) + len(right)
     print(nSides)
@@ -116,7 +120,7 @@ def extract_sides(farm, perimeter):
     return nSides
 
 def main():
-    farm = read_farm(DUMMY)
+    farm = read_farm(INPUT)
     regions, perimeters = parse_regions(farm)
     price = 0
     for i in range(0, len(regions)):
