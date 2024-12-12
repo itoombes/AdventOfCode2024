@@ -25,9 +25,8 @@ def parse_regions(farm):
     perimeters = list()
     for r in range(0, len(farm)):
         for c in range(0, len(farm[0])):
-            if farm[r][c] not in visited:
+            if (r, c) not in visited:
                 newRegion, newPerimeter = grow_region(farm, r, c)
-                input()
                 for tile in newRegion:
                     visited.append(tile)
                 regions.append(newRegion)
@@ -46,25 +45,30 @@ def grow_region(farm, row, col):
         # Get adjacent tiles, add to frontier
         # If any spot without neighbours, add to perimeter
         for nR, nC in ((r - 1, c), (r, c - 1), (r + 1, c), (r, c + 1)):
-            print(f"\t({nR}, {nC}) : ", end="")
+            #print(f"\t({nR}, {nC}) : ", end="")
             if (nR, nC) in region:
-                print("Already explored")
-                break
-            if nR > 0 and nC > 0 and nR < len(farm) - 1 and nC < len(farm[0]) - 1 and farm[nR][nC] == tileType:
-                print("New & part of region!")
+                #print("Already explored")
+                continue
+            if nR < 0 or nC < 0 or nR >= len(farm) or nC >= len(farm[0]):
+                #print("Out of bounds")
+                perimeter += 1
+                continue
+            if farm[nR][nC] == tileType:
+                #print("New tile in region!")
                 region.append((nR, nC))
                 frontier.append((nR, nC))
             else:
-                print("Not part of region")
+                #print("Tile not in region")
                 perimeter += 1
-    print(f"Region is:\n{region}")
     return region, perimeter
 
 def main():
-    farm = read_farm(DUMMY)
+    farm = read_farm(INPUT)
     regions, perimeters = parse_regions(farm)
-    print(regions)
-    print(perimeters)
+    price = 0
+    for i in range(0, len(regions)):
+        price += len(regions[i]) * perimeters[i]
+    print(price)
 
 if __name__ == "__main__":
     main()
