@@ -62,16 +62,66 @@ def grow_region(farm, row, col):
                     perimeter.append((r, c))
     return region, perimeter
 
-def extract_sides(perimeter):
-    print(perimeter)
-    return 1
+def extract_sides(farm, perimeter):
+    up = list()
+    down = list()
+    left = list()
+    right = list()
+    # Extract each side
+    for r, c in perimeter:
+        # Check up
+        if r == 0 or farm[r - 1][c] != farm[r][c]:
+            up.append((r,c))
+        if r == len(farm) - 1 or farm[r + 1][c] != farm[r][c]:
+            down.append((r, c))
+        if c == 0 or farm[r][c - 1] != farm[r][c]:
+            left.append((r,c))
+        if c == len(farm[0]) - 1 or farm[r][c + 1] != farm[r][c]:
+            right.append((r,c))
+    i = 0
+    while i < len(up):
+        r, c = up[i]
+        nC = c + 1
+        while (r, nC) in up:
+            up.remove((r, nC))
+            nC += 1
+        i += 1
+    i = 0
+    while i < len(down):
+        r, c = down[i]
+        nC = c + 1
+        while (r, nC) in down:
+            down.remove((r, nC))
+            nC += 1
+        i += 1
+    i = 0
+    while i < len(left):
+        r, c = left[i]
+        nR = r + 1
+        while (nR, c) in left:
+            left.remove((nR, c))
+            nR += 1
+        i += 1
+    i = 0
+    while i < len(right):
+        r, c = right[i]
+        nR = r + 1
+        while (nR, c) in right:
+            right.remove((nR, c))
+            nR += 1
+        i += 1
+    nSides = len(up) + len(down) + len(left) + len(right)
+    print(nSides)
+    print(f"U{up}, D{down}, L{left}, R{right}")
+    return nSides
 
 def main():
     farm = read_farm(DUMMY)
     regions, perimeters = parse_regions(farm)
     price = 0
     for i in range(0, len(regions)):
-        price += regions[i] * extract_sides(perimeters[i])
+        print(f"Area : {regions[i]} | Perimeter : ", end="")
+        price += regions[i] * extract_sides(farm, perimeters[i])
     print(price)
 
 if __name__ == "__main__":
