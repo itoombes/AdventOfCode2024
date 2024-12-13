@@ -1,6 +1,8 @@
 # itoombes, Advent of Code 2024
 # Day 13
 
+import numpy as np
+
 DUMMY = "dummyinput.txt"
 INPUT = "input.txt"
 
@@ -20,29 +22,18 @@ class Machine:
         return string
     
     def get_presses(self):
-        ax = self._ax
-        bx = self._bx
-        ay = self._ay
-        by = self._by
-        px = self._px
-        py = self._py
-        # Check linear independence
-        if ax % bx == 0 and ay % by == 0:
-            print("Linear independence!")
-            print(str(self))
-            exit()
-        # Test if matrix is invertible
-        det = (ax * by) - (bx * ay)
-        if det == 0:
-            return None
-        # Invert the matrix
-        invdet = 1 / det
-        A = int(invdet * ((by * px) - (bx * py)))
-        B = int(invdet * ((ax * py) - (ay * px)))
-        # Check that valid combo
-        if (A*ax + B*bx == px) and (A*ay + B*by == py):
+        buttons = np.array([[self._ax, self._bx], [self._ay, self._by]])
+        target = np.array([self._px, self._py])
+        result = np.linalg.solve(buttons, target)
+       # print(result)
+       # print(np.round(result))
+        A = np.round(result)[0]
+        B = np.round(result)[1]
+        if ((A * self._ax) + (B * self._bx) == self._px) and ((A * self._ay) + (B * self._by) == self._py):
+    #       print((A, B))
             return (A, B)
         return None
+        
 
     def get_cost(self):
         presses = self.get_presses()
@@ -75,7 +66,7 @@ def extract_machines(file):
 
 def main():
     cost = 0
-    for machine in extract_machines(DUMMY):
+    for machine in extract_machines(INPUT):
         cost += machine.get_cost()
     print(cost)
 
