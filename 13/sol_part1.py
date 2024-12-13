@@ -18,6 +18,31 @@ class Machine:
         string += f"Button B: X+{self._bx}, Y+{self._by}\n"
         string += f"Prize: X={self._px}, Y={self._py}\n"
         return string
+    
+    def get_presses(self):
+        ax = self._ax
+        bx = self._bx
+        ay = self._ay
+        by = self._by
+        px = self._px
+        py = self._py
+        # Check linear independence
+        if ax % bx == 0 and ay % by == 0:
+            print("Linear independence!")
+            print(str(self))
+            exit()
+
+        det = (ax * by) - (bx * ay)
+        if det == 0:
+            return None
+
+        invdet = 1 / det
+        A = invdet * ((by * px) - (bx * py))
+        B = invdet * ((ax * py) - (ay * px))
+        if A % 1 == 0 and B % 1 == 0:
+            return (int(A), int(B))
+        else:
+            return None
 
 def extract_machines(file):
     f = open(file, "r")
@@ -42,8 +67,8 @@ def extract_machines(file):
 
 
 def main():
-    for machine in extract_machines(INPUT):
-        print(str(machine))
+    for machine in extract_machines(DUMMY):
+        print(machine.get_presses())
 
 if __name__ == "__main__":
     main()
