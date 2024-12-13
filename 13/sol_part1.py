@@ -31,19 +31,26 @@ class Machine:
             print("Linear independence!")
             print(str(self))
             exit()
-
+        # Test if matrix is invertible
         det = (ax * by) - (bx * ay)
         if det == 0:
             return None
-
+        # Invert the matrix
         invdet = 1 / det
-        A = invdet * ((by * px) - (bx * py))
-        B = invdet * ((ax * py) - (ay * px))
-        if A % 1 == 0 and B % 1 == 0:
-            return (int(A), int(B))
-        else:
-            return None
+        A = int(invdet * ((by * px) - (bx * py)))
+        B = int(invdet * ((ax * py) - (ay * px)))
+        # Check that valid combo
+        if (A*ax + B*bx == px) and (A*ay + B*by == py):
+            return (A, B)
+        return None
 
+    def get_cost(self):
+        presses = self.get_presses()
+        if presses is None:
+            return 0
+        else:
+            return (presses[0] * 3) + (presses[1])
+            
 def extract_machines(file):
     f = open(file, "r")
     lines = f.readlines()
@@ -67,8 +74,10 @@ def extract_machines(file):
 
 
 def main():
+    cost = 0
     for machine in extract_machines(DUMMY):
-        print(machine.get_presses())
+        cost += machine.get_cost()
+    print(cost)
 
 if __name__ == "__main__":
     main()
