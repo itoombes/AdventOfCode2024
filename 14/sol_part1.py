@@ -5,9 +5,9 @@ DUMMY = "dummyinput.txt"
 EDUMMY = "dummydummy.txt"
 INPUT = "input.txt"
 
-WIDTH = 11
+WIDTH = 101
 MIDX = WIDTH // 2
-HEIGHT = 7
+HEIGHT = 103
 MIDY = HEIGHT // 2
 SECONDS = 100
 
@@ -25,6 +25,22 @@ class Robot():
         x = (self._px + self._vx * SECONDS) % WIDTH
         y = (self._py + self._vy * SECONDS) % HEIGHT
         return (x, y)
+
+    def get_quadrant(self):
+        x, y = self.get_final_position()
+        # Parse quandrant
+        if x == MIDX or y == MIDY:
+            return None
+        if x < MIDX:
+            if y < MIDY:
+                return "ll"
+            else:
+                return "ul"
+        else:
+            if y < MIDY:
+                return "lr"
+            else:
+                return "ur"
 
     def __str__(self):
         return f"p={self._px},{self._py}, v={self._vx},{self._vy}"
@@ -58,13 +74,30 @@ def print_robots(robots, final):
     print() # Newline
 
 def main():
-    robots = get_robots(DUMMY)
+    robots = get_robots(INPUT)
+    # Get robots, ensure in correct positions
     for robot in robots:
         print(robot)
-        print(robot.get_final_position())
     print_robots(robots, False)
     print_robots(robots, True)
 
+    # Establish quadrants
+    ul, ur, ll, lr = (0, 0, 0, 0)
+    for robot in robots:
+        quadrant = robot.get_quadrant()
+        if quadrant is None:
+            pass
+        elif quadrant == "ul":
+            ul += 1
+        elif quadrant == "ur":
+            ur += 1
+        elif quadrant == "ll":
+            ll += 1
+        elif quadrant == "lr":
+            lr += 1
+    sf = ul * ur * ll * lr
+    print(f"Safety factor : {sf}")
+     
 
 if __name__ == "__main__":
     main()
