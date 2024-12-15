@@ -190,19 +190,26 @@ class Warehouse():
         self._boxes.remove((r, c))
         self._boxes.append((r, cFree))
 
+    def perform_all_instructions(self):
+        while len(self._cmds) != 0:
+            self.step()
 
-
-    
+    def solve_part_1(self):
+        self.perform_all_instructions()
+        result = 0
+        for box in self._boxes:
+            increment = (100 * box[0]) + box[1]
+            result += increment
+        return result
 
 def main():
-    #warehouse = Warehouse(INPUT)
+    warehouse = Warehouse(INPUT)
     #warehouse = Warehouse(DUMMY)
-    warehouse = Warehouse(TEST_IN)
+    #warehouse = Warehouse(TEST_IN)
     print(str(warehouse))
     print(warehouse.get_instruction_string())
-    while True:
-        warehouse.step()
-        print(str(warehouse))
-        input()
+    print(warehouse.solve_part_1())
+    print(str(warehouse))
+
 if __name__ == "__main__":
     main()
