@@ -206,7 +206,7 @@ class Warehouse():
                     rBoxes.add((r, c))
                     lBoxes.add((r, c - 1))
                     nextCheck.append((r, c))
-                    nextCheck.append((r, c + 1))
+                    nextCheck.append((r, c - 1))
             toCheck = nextCheck
         # If here, can move
         print(f"Left : {lBoxes}")
@@ -285,23 +285,24 @@ class Warehouse():
             print(self.get_instruction_string()[:1])
             self.step()
             print(str(self))
-            input()
+            #input()
         print("No more instructions")
 
     def solve(self):
         self.perform_all_instructions()
         result = 0
         for box in self._l_boxes:
+            print(box)
             increment = (100 * box[0]) + box[1]
             result += increment
         return result
 
 def main():
-    #warehouse = Warehouse(INPUT)
-    warehouse = Warehouse(DUMMY)
+    warehouse = Warehouse(INPUT)
+    #warehouse = Warehouse(DUMMY)
     #warehouse = Warehouse(TEST_IN)
     print(str(warehouse))
-    warehouse.perform_all_instructions()
+    print(warehouse.solve())
 
 if __name__ == "__main__":
     main()
