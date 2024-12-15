@@ -151,28 +151,28 @@ class Warehouse():
         r -= 1
         if not self.attempt_move(r, c): return
         # Handle box motion
-        lBoxes = list()
-        rBoxes = list()
+        lBoxes = set()
+        rBoxes = set()
         # Ensure every box has a space to move to
-        toCheck = [(r, c),]
+        toCheck = [self._robot,]
         while len(toCheck) > 0:
             nextCheck = list()
             for r, c in toCheck:
+                r -= 1
                 if (r, c) in self._walls:
-                    return # Cannot move
-                elif (r, c) in self._l_boxes:
-                    lBoxes.append((r, c))
-                    rBoxes.append((r, c + 1))
-                    nextCheck.append((r - 1, c))
-                    nextCheck.append((r - 1, c + 1))
+                    return # No possible solutions
+                if (r, c) in self._l_boxes:
+                    lBoxes.add((r, c))
+                    rBoxes.add((r, c + 1))
+                    nextCheck.append((r, c))
+                    nextCheck.append((r, c + 1))
                 elif (r, c) in self._r_boxes:
-                    rBoxes.append((r, c))
-                    lBoxes.append((r, c - 1))
-                    nextCheck.append((r - 1, c))
-                    nextCheck.append((r - 1, c - 1))
+                    rBoxes.add((r, c))
+                    lBoxes.add((r, c - 1))
+                    nextCheck.append((r, c))
+                    nextCheck.append((r, c - 1))
             toCheck = nextCheck
-        # If here, can move
-        # Clear out space in arrays - do before adding to avoid removing dupes
+        # Update boxes
         for box in lBoxes: self._l_boxes.remove(box)
         for box in rBoxes: self._r_boxes.remove(box)
         # Add the new boxes in the row above
@@ -186,8 +186,8 @@ class Warehouse():
         r += 1
         if not self.attempt_move(r, c): return
         # Handle box motion
-        lBoxes = list()
-        rBoxes = list()
+        lBoxes = set()
+        rBoxes = set()
         toCheck = [(r, c),]
         while len(toCheck) > 0:
             nextCheck = list()
@@ -195,13 +195,13 @@ class Warehouse():
                 if (r, c) in self._walls:
                     return
                 elif (r, c) in self._l_boxes:
-                    lBoxes.append((r, c))
-                    rBoxes.append((r, c + 1))
+                    lBoxes.add((r, c))
+                    rBoxes.add((r, c + 1))
                     nextCheck.append((r + 1, c))
                     nextCheck.append((r + 1, c + 1))
                 elif (r, c) in self._r_boxes:
-                    rBoxes.append((r, c))
-                    lBoxes.append((r, c - 1))
+                    rBoxes.add((r, c))
+                    lBoxes.add((r, c - 1))
                     nextCheck.append((r + 1, c))
                     nextCheck.append((r - 1, c - 1))
             toCheck = nextCheck
@@ -281,6 +281,7 @@ class Warehouse():
             self.step()
             print(str(self))
             input()
+        print("No more instructions")
 
     def solve(self):
         self.perform_all_instructions()
@@ -292,8 +293,8 @@ class Warehouse():
 
 def main():
     #warehouse = Warehouse(INPUT)
-    warehouse = Warehouse(DUMMY)
-    #warehouse = Warehouse(TEST_IN)
+    #warehouse = Warehouse(DUMMY)
+    warehouse = Warehouse(TEST_IN)
     print(str(warehouse))
     warehouse.perform_all_instructions()
 
