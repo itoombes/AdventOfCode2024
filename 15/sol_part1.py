@@ -22,12 +22,20 @@ R = 3
 
 class Warehouse():
     def __init__(self, files):
+        # Parse the warehouse
         wFileContent = Warehouse.parse_warehouse_file(files[0])
+        # Number of rows and number of columns
         self._height = wFileContent[0]
         self._width = wFileContent[1]
+        # Array in form [(<wall row>, <wall column>),]
         self._walls = wFileContent[2]
+        # Array in form [(<box row>, <box column>),]
         self._boxes = wFileContent[3]
+        # Robot location as (<row>, <column>)
         self._robot = wFileContent[4]
+
+        # Parse the instructions
+        self._cmds = Warehouse.parse_instruction_file(files[1])
         
     def parse_warehouse_file(file):
         f = open(file, "r")
@@ -50,8 +58,31 @@ class Warehouse():
                     origin = (r, w)
         return (height, width, walls, boxes, origin)
 
-    def parse_instruct_file(file):
-        pass
+    def parse_instruction_file(file):
+        # Read the file as one large string, no newlines
+        f = open(file, "r")
+        lines = f.readlines()
+        cmdString = ""
+        for line in lines:
+            cmdString += line.replace("\n", "")
+        # Convert the string to a char
+        cmds = list()
+        for c in cmdString:
+            if c == U_CHAR: cmds.append(U)
+            elif c == D_CHAR: cmds.append(D)
+            elif c == L_CHAR: cmds.append(L)
+            elif c == R_CHAR: cmds.append(R)
+
+        return cmds
+
+    def get_instruction_string(self):
+        string = ""
+        for c in self._cmds:
+            if c == U: string += U_CHAR
+            elif c == D: string += D_CHAR
+            elif c == R: string += R_CHAR
+            elif c == L: string += L_CHAR
+        return string
 
     def __str__(self):
         # Generate representation as array
@@ -70,8 +101,11 @@ class Warehouse():
     
 
 def main():
-    warehouse = Warehouse(TEST_IN)
+    warehouse = Warehouse(INPUT)
+    #warehouse = Warehouse(DUMMY)
+    #warehouse = Warehouse(TEST_IN)
     print(str(warehouse))
+    print(warehouse.get_instruction_string())
 
 if __name__ == "__main__":
     main()
