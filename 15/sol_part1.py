@@ -98,14 +98,111 @@ class Warehouse():
         for line in array:
             string += line + "\n"
         return string
+
+    def step(self):
+        # Perform next step in instructions
+        cmd = self._cmds.pop(0)
+        if cmd == U:
+            self.move_up()
+        elif cmd == D:
+            self.move_down()
+        elif cmd == L:
+            self.move_left()
+        elif cmd == R:
+            self.move_right()
+
+    def attempt_move(self, row, col):
+        # Returns True if move collides with box
+        # Returns False otherwise
+        # If robot changes spot, updates
+        if (row, col) in self._walls:
+            return False
+        if (row, col) not in self._boxes:
+            self._robot = (row, col)
+            return False
+        return True
+        # Don't need to check if in bounds - walls enclose the area
+
+    def move_up(self):
+        r, c = self._robot
+        r -= 1
+        if not self.attempt_move(r, c): return
+        # Handle box motion
+        # Get next free space, if it exists
+        rFree = r
+        while True:
+            rFree -= 1
+            if (rFree, c) in self._walls:
+                return
+            if (rFree, c) not in self._boxes:
+                break
+        # Update robot and box position
+        self._robot = (r, c)
+        self._boxes.remove((r, c))
+        self._boxes.append((rFree, c))
+
+
+    def move_down(self):
+        r, c = self._robot
+        r += 1
+        if not self.attempt_move(r, c): return
+        # Handle box motion
+        rFree = r
+        while True:
+            rFree += 1
+            if (rFree, c) in self._walls:
+                return
+            if (rFree, c) not in self._boxes:
+                break
+        self._robot = (r, c)
+        self._boxes.remove((r, c))
+        self._boxes.append((rFree, c))
+
+    def move_left(self):
+        r, c = self._robot
+        c -= 1
+        if not self.attempt_move(r, c): return
+        # Handle box motion
+        cFree = c
+        while True:
+            cFree -= 1
+            if (r, cFree) in self._walls:
+                return
+            if (r, cFree) not in self._boxes:
+                break
+        self._robot = (r, c)
+        self._boxes.remove((r, c))
+        self._boxes.append((r, cFree))
+
+    def move_right(self):
+        r, c = self._robot
+        c += 1
+        if not self.attempt_move(r, c): return
+        # Handle box motion
+        cFree = c
+        while True:
+            cFree += 1
+            if (r, cFree) in self._walls:
+                return
+            if (r, cFree) not in self._boxes:
+                break
+        self._robot = (r, c)
+        self._boxes.remove((r, c))
+        self._boxes.append((r, cFree))
+
+
+
     
 
 def main():
-    warehouse = Warehouse(INPUT)
+    #warehouse = Warehouse(INPUT)
     #warehouse = Warehouse(DUMMY)
-    #warehouse = Warehouse(TEST_IN)
+    warehouse = Warehouse(TEST_IN)
     print(str(warehouse))
     print(warehouse.get_instruction_string())
-
+    while True:
+        warehouse.step()
+        print(str(warehouse))
+        input()
 if __name__ == "__main__":
     main()
