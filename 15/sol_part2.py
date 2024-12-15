@@ -163,6 +163,31 @@ class Warehouse():
         c -= 1
         if not self.attempt_move(r, c): return
         # Handle box motion
+        rBoxes = list()
+        lBoxes = list()
+        freeC = c
+        while True:
+            if (r, freeC) in self._walls:
+                return
+            if (r, freeC) in self._l_boxes:
+                lBoxes.append((r, freeC))
+            elif (r, freeC) in self._r_boxes:
+                rBoxes.append((r, freeC))
+            else:
+                break
+            freeC -= 1
+        # Clean up existing boxes
+        for rBox in rBoxes:
+            self._r_boxes.remove(rBox)
+        for lBox in lBoxes:
+            self._l_boxes.remove(lBox)
+        # Update robot position
+        self._robot = (r, c)
+        # Add new boxes between old position and new position
+        while freeC < c:
+            self._l_boxes.append((r, freeC))
+            self._r_boxes.append((r, freeC + 1))
+            freeC += 2
 
     def move_right(self):
         r, c = self._robot
@@ -174,7 +199,7 @@ class Warehouse():
         while len(self._cmds) != 0:
             self.step()
 
-    def solve_part_1(self):
+    def solve(self):
         self.perform_all_instructions()
         result = 0
         for box in self._l_boxes:
@@ -184,8 +209,10 @@ class Warehouse():
 
 def main():
     #warehouse = Warehouse(INPUT)
-    warehouse = Warehouse(DUMMY)
-    #warehouse = Warehouse(TEST_IN)
+    #warehouse = Warehouse(DUMMY)
+    warehouse = Warehouse(TEST_IN)
+    print(str(warehouse))
+    warehouse.step()
     print(str(warehouse))
 
 if __name__ == "__main__":
