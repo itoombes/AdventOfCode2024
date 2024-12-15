@@ -277,7 +277,10 @@ class Warehouse():
 
     def perform_all_instructions(self):
         while len(self._cmds) != 0:
+            print(self.get_instruction_string()[:1])
             self.step()
+            print(str(self))
+            input()
 
     def solve(self):
         self.perform_all_instructions()
@@ -289,12 +292,10 @@ class Warehouse():
 
 def main():
     #warehouse = Warehouse(INPUT)
-    #warehouse = Warehouse(DUMMY)
-    warehouse = Warehouse(TEST_IN)
+    warehouse = Warehouse(DUMMY)
+    #warehouse = Warehouse(TEST_IN)
     print(str(warehouse))
-    for i in range(0, 8):
-        warehouse.perform_all_instructions()
-        print(str(warehouse))
+    warehouse.perform_all_instructions()
 
 if __name__ == "__main__":
     main()
