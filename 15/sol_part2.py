@@ -173,6 +173,8 @@ class Warehouse():
                     nextCheck.append((r, c - 1))
             toCheck = nextCheck
         # Update boxes
+        print(f"Left : {lBoxes}")
+        print(f"Right : {rBoxes}")
         for box in lBoxes: self._l_boxes.remove(box)
         for box in rBoxes: self._r_boxes.remove(box)
         # Add the new boxes in the row above
@@ -188,30 +190,33 @@ class Warehouse():
         # Handle box motion
         lBoxes = set()
         rBoxes = set()
-        toCheck = [(r, c),]
+        toCheck = [self._robot,]
         while len(toCheck) > 0:
             nextCheck = list()
             for r, c in toCheck:
+                r += 1
                 if (r, c) in self._walls:
                     return
-                elif (r, c) in self._l_boxes:
+                if (r, c) in self._l_boxes:
                     lBoxes.add((r, c))
                     rBoxes.add((r, c + 1))
-                    nextCheck.append((r + 1, c))
-                    nextCheck.append((r + 1, c + 1))
-                elif (r, c) in self._r_boxes:
+                    nextCheck.append((r, c))
+                    nextCheck.append((r, c + 1))
+                if (r, c) in self._r_boxes:
                     rBoxes.add((r, c))
                     lBoxes.add((r, c - 1))
-                    nextCheck.append((r + 1, c))
-                    nextCheck.append((r - 1, c - 1))
+                    nextCheck.append((r, c))
+                    nextCheck.append((r, c + 1))
             toCheck = nextCheck
         # If here, can move
+        print(f"Left : {lBoxes}")
+        print(f"Right : {rBoxes}")
         for box in lBoxes: self._l_boxes.remove(box)
         for box in rBoxes: self._r_boxes.remove(box)
         for r, c in lBoxes: self._l_boxes.append((r + 1, c))
         for r, c in rBoxes: self._r_boxes.append((r + 1, c))
         # Update robot position
-        self._robot = (self._robot[0] - 1, self._robot[1])
+        self._robot = (self._robot[0] + 1, self._robot[1])
 
     def move_left(self):
         r, c = self._robot
@@ -293,8 +298,8 @@ class Warehouse():
 
 def main():
     #warehouse = Warehouse(INPUT)
-    #warehouse = Warehouse(DUMMY)
-    warehouse = Warehouse(TEST_IN)
+    warehouse = Warehouse(DUMMY)
+    #warehouse = Warehouse(TEST_IN)
     print(str(warehouse))
     warehouse.perform_all_instructions()
 
