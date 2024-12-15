@@ -151,12 +151,67 @@ class Warehouse():
         r -= 1
         if not self.attempt_move(r, c): return
         # Handle box motion
+        lBoxes = list()
+        rBoxes = list()
+        # Ensure every box has a space to move to
+        toCheck = [(r, c),]
+        while len(toCheck) > 0:
+            nextCheck = list()
+            for r, c in toCheck:
+                if (r, c) in self._walls:
+                    return # Cannot move
+                elif (r, c) in self._l_boxes:
+                    lBoxes.append((r, c))
+                    rBoxes.append((r, c + 1))
+                    nextCheck.append((r - 1, c))
+                    nextCheck.append((r - 1, c + 1))
+                elif (r, c) in self._r_boxes:
+                    rBoxes.append((r, c))
+                    lBoxes.append((r, c - 1))
+                    nextCheck.append((r - 1, c))
+                    nextCheck.append((r - 1, c - 1))
+            toCheck = nextCheck
+        # If here, can move
+        # Clear out space in arrays - do before adding to avoid removing dupes
+        for box in lBoxes: self._l_boxes.remove(box)
+        for box in rBoxes: self._r_boxes.remove(box)
+        # Add the new boxes in the row above
+        for r, c in lBoxes: self._l_boxes.append((r - 1, c))
+        for r, c in rBoxes: self._r_boxes.append((r - 1, c))
+        # Update robot position
+        self._robot = (self._robot[0] - 1, self._robot[1])
 
     def move_down(self):
         r, c = self._robot
         r += 1
         if not self.attempt_move(r, c): return
         # Handle box motion
+        lBoxes = list()
+        rBoxes = list()
+        toCheck = [(r, c),]
+        while len(toCheck) > 0:
+            nextCheck = list()
+            for r, c in toCheck:
+                if (r, c) in self._walls:
+                    return
+                elif (r, c) in self._l_boxes:
+                    lBoxes.append((r, c))
+                    rBoxes.append((r, c + 1))
+                    nextCheck.append((r + 1, c))
+                    nextCheck.append((r + 1, c + 1))
+                elif (r, c) in self._r_boxes:
+                    rBoxes.append((r, c))
+                    lBoxes.append((r, c - 1))
+                    nextCheck.append((r + 1, c))
+                    nextCheck.append((r - 1, c - 1))
+            toCheck = nextCheck
+        # If here, can move
+        for box in lBoxes: self._l_boxes.remove(box)
+        for box in rBoxes: self._r_boxes.remove(box)
+        for r, c in lBoxes: self._l_boxes.append((r + 1, c))
+        for r, c in rBoxes: self._r_boxes.append((r + 1, c))
+        # Update robot position
+        self._robot = (self._robot[0] - 1, self._robot[1])
 
     def move_left(self):
         r, c = self._robot
@@ -237,8 +292,9 @@ def main():
     #warehouse = Warehouse(DUMMY)
     warehouse = Warehouse(TEST_IN)
     print(str(warehouse))
-    warehouse.step()
-    print(str(warehouse))
+    for i in range(0, 8):
+        warehouse.perform_all_instructions()
+        print(str(warehouse))
 
 if __name__ == "__main__":
     main()
