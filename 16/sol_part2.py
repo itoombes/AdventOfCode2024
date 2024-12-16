@@ -134,7 +134,7 @@ class Maze():
                     bestPathTiles.add(tile[0:2])
                 continue
             # Ensure does not exceed path length
-            if node.get_score() >= threshold:
+            if (node.get_score() + self.heuristic(node.get_row(), node.get_col())) > threshold:
                 continue
             # Else, get successors
             for s in node.get_successors():
