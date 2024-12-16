@@ -8,7 +8,7 @@ import heapq
 MAZE_0 = "input.txt"
 MAZE_1 = "dummyinput.txt"
 MAZE_2 = "testinput.txt"
-INPUT = MAZE_2
+INPUT = MAZE_1
 
 class Compass(Enum):
     N = 0
@@ -103,13 +103,20 @@ class Maze():
             string += line + "\n"
         print(string)
     
-    def ucs_solve(self):
+    def heuristic(self, row, col):
+        dr = self._end[0] - row
+        if dr < 0: dr *= -1
+        dc = self._end[1] - col
+        if dc < 0: dc *= -1
+        return dr + dc
+    
+    def astar_solve(self):
         initNode = MazeNode(self._start[0], self._start[1], Compass.E, 0)
-        frontier = [initNode]
+        frontier = [(self.heuristic(initNode.get_row(), initNode.get_col()),initNode)]
         heapq.heapify(frontier)
         visited = {initNode.get_state() : initNode.get_score()}
         while len(frontier) > 0:
-            node = heapq.heappop(frontier)
+            _, node = heapq.heappop(frontier)
             print(str(node))
 
             if node.get_row() == self._end[0] and node.get_col() == self._end[1]:
@@ -125,14 +132,14 @@ class Maze():
                 # Check if not visited || visited at higher cost
                 if s.get_state() not in visited.keys() or s.get_score() < visited[s.get_state()]:
                     visited[s.get_state] = s.get_score()
-                    heapq.heappush(frontier, s)
+                    heapq.heappush(frontier, (s.get_score() + self.heuristic(s.get_row(), s.get_col()), s))
         return None
 
 
 def main():
     maze = Maze(INPUT)
     input()
-    print(maze.ucs_solve())
+    print(maze.astar_solve())
 
 if __name__ == "__main__":
     main()
