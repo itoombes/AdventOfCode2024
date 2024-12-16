@@ -4,9 +4,6 @@
 from enum import Enum
 import heapq
 
-import queue
-import copy
-
 # Inputs
 MAZE_0 = "input.txt"
 MAZE_1 = "dummyinput.txt"
@@ -146,45 +143,37 @@ class Maze():
             return None
         print(f"Threshold is : {threshold}")
         input()
-        # Perform a DFS search
-        bestPathTiles = set()
-
+        # Perform a BFS search
         initNode = MazeNode(self._start[0], self._start[1], Compass.E, 0)
-        frontier = queue.LifoQueue()
-        frontier.put((set(), initNode))
-        while not frontier.empty():
-            # Generate node and successors visited set
-            visited, node = frontier.get()
+        frontier = [(list(), initNode),]
+        bestPathTiles = set()
+        while len(frontier) > 0:
+            visited, node = frontier.pop(0)
             print(node)
-            sVisited = copy.deepcopy(visited)
-            sVisited.add(node)
-            # Detect if end
-            if self._maze[node.get_row()][node.get_col()] == "E":
-                for tile in sVisited:
+            # Ensure does not exceed path length
+            if node.get_score() > threshold:
+                continue
+            # If valid path, add the tiles in the path to the next
+            if node.get_score() == threshold:
+                for tile in visited:
                     bestPathTiles.add(tile[0:2])
                 continue
-
+            # Else, get successors
             for s in node.get_successors():
-                # Skip any successor that exceeds the score
-                if s.get_score() > threshold:
+                # Avoid backtracking - can't be shortest path if so
+                if s.get_state() in visited:
                     continue
-                # Skip any successor that has already been visited
-                if s in visited:
-                    continue
-                # Skip any successor that is inside a wall
+                # Ensure valid
                 if self._maze[s.get_row()][s.get_col()] == "#":
                     continue
-                # Add successors to the frontier
-                frontier.put((sVisited, s))
-        # Print the maze with output tiles
-        print()
+                frontier.append((visited + [s.get_state()], s))
+        
         for r, c in bestPathTiles:
             self._maze[r] = self._maze[r][:c] + "O" + self._maze[r][c + 1:]
         for line in self._maze:
             print(line)
-        print()
         
-        return len(bestPathTiles)
+        return len(bestPathTiles) + 1
 
 def main():
     maze = Maze(INPUT)
