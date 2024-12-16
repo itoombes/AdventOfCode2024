@@ -8,7 +8,7 @@ import heapq
 MAZE_0 = "input.txt"
 MAZE_1 = "dummyinput.txt"
 MAZE_2 = "testinput.txt"
-INPUT = MAZE_1
+INPUT = MAZE_0
 
 class Compass(Enum):
     N = 0
@@ -131,10 +131,8 @@ class Maze():
                     continue
                 
                 # Check if not visited || visited at higher cost
-                if s.get_state() in visited.keys():
-                    print("!!! Already visited !!!")
                 if s.get_state() not in visited.keys() or s.get_score() < visited[s.get_state()]:
-                    visited[s.get_state] = s.get_score()
+                    visited[s.get_state()] = s.get_score()
                     heapq.heappush(frontier, (s.get_score() + self.heuristic(s.get_row(), s.get_col()), s))
         return None
 
