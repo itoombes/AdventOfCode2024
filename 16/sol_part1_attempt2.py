@@ -22,6 +22,9 @@ class MazeNode():
         self._col = col
         self._direction = direction
         self._score = score
+
+    def __str__(self):
+        return f"({self._score}, ({self._row}, {self._col}, {self._direction}))"
     
     def get_row(self):
         return self._row
@@ -36,38 +39,38 @@ class MazeNode():
         return self._score
 
     def cw(self):
-        if self.direction == Compass.N:
+        if self._direction == Compass.N:
             return Compass.E
-        if self.direction == Compass.E:
+        if self._direction == Compass.E:
             return Compass.S
-        if self.direction == Compass.S:
+        if self._direction == Compass.S:
             return Compass.W
-        if self.direction == Compass.W:
+        if self._direction == Compass.W:
             return Compass.N
     def ccw(self):
-        if self.direction == Compass.N:
+        if self._direction == Compass.N:
             return Compass.W
-        if self.direction == Compass.E:
+        if self._direction == Compass.E:
             return Compass.N
-        if self.direction == Compass.S:
+        if self._direction == Compass.S:
             return Compass.E
-        if self.direction == Compass.W:
+        if self._direction == Compass.W:
             return Compass.S
 
     def get_successors(self):
         # Update movement
         nextRow, nextCol = self._row, self._col
-        if self.direction == Compass.N:
+        if self._direction == Compass.N:
             nextRow -= 1
-        elif self.direction == Compass.E:
+        elif self._direction == Compass.E:
             nextCol += 1
-        elif self.direction == Compass.S:
+        elif self._direction == Compass.S:
             nextRow += 1
-        elif self.direction == Compass.W:
+        elif self._direction == Compass.W:
             nextCol -= 1
 
         # Return successors
-        return [MazeNode(nextRow, nextCol, self.direction, self._score + 1),
+        return [MazeNode(nextRow, nextCol, self._direction, self._score + 1),
                 MazeNode(self._row, self._col, self.cw(), self._score + 1000),
                 MazeNode(self._row, self._col, self.ccw(), self._score + 1000)]
     
@@ -95,13 +98,14 @@ class Maze():
                         self._end = (r, c)
             self._maze.append(line)
     
-    def solve(self):
-        print((self._maze, self._start, self._end))
+    def ucs_solve(self):
+        initNode = MazeNode(self._start[0], self._start[1], Compass.E, 0)
+
 
 
 def main():
     maze = Maze(INPUT)
-    print(maze.solve())
+    print(maze.ucs_solve())
 
 if __name__ == "__main__":
     main()
