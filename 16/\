@@ -1,0 +1,60 @@
+# itoombes, Advent of Code 2024
+# Day 16
+
+# Input
+MAZE_0 = "input.txt"
+MAZE_1 = "dummyinput.txt"
+MAZE_2 = "testinput.txt"
+INPUT = MAZE_1
+# Chars
+WALL = "#"
+FREE = "."
+START = "S"
+END = "E"
+# Directions
+N = 0
+E = 1
+S = 2
+W = 3
+DEFAULT_DIR = E
+
+class Maze():
+    def __init__(self, file):
+        self._maze, self._start = Maze.read_maze(file)
+    
+    def __str__(self):
+        string = ""
+        for r, row in enumerate(self._maze):
+            string += row + "\n"
+        return string
+
+    def read_maze(file):
+        f = open(file, "r")
+        maze = list()
+        start = end = None
+        for r, line in enumerate(f.readlines()):
+            line = line.replace("\n", "")
+            if "S" in line:
+                for c in range(0, len(line)):
+                    if line[c] == START:
+                        start = (r, c)
+            maze.append(line)
+        return (maze, start)
+    
+    def bfs_solve(self):
+        # Storing nodes as (<parent>, <row>, <col>, <direction>, <explored>, <score>)
+        frontier = [(None, self._start[0], self._start[1], DEFAULT_DIR, [(self._start[0], self._start[1], DEFAULT_DIR),], 0),]
+        
+        while len(frontier) > 0:
+            node = frontier.pop(0)
+            _, r, c, direction, explored, score = node
+            print(node)
+
+
+def main():
+    maze = Maze(INPUT)
+    maze.bfs_solve()
+
+
+if __name__ == "__main__":
+    main()
