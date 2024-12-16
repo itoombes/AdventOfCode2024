@@ -2,6 +2,7 @@
 # Day 16 
 from enum import Enum
 import heapq 
+import copy
 # Inputs
 MAZE_0 = "input.txt"
 MAZE_1 = "dummyinput.txt"
@@ -122,36 +123,42 @@ class Maze():
         print(f"Threshold is : {threshold}")
         input()
         # Perform a BFS search
-        initNode = MazeNode(self._start[0], self._start[1], Compass.E, 0)
-        frontier = [(list(), initNode),]
         bestPathTiles = set()
+
+        initNode = MazeNode(self._start[0], self._start[1], Compass.E, 0)
+        frontier = [(set(), initNode),]
+        visited = dict()
         while len(frontier) > 0:
-            visited, node = frontier.pop(0)
+            path, node = frontier.pop(0)
+            path = copy.deepcopy(path)
+            path.add(node.get_state()[0:2])
             print(node)
-            # If valid path, add the tiles in the path to the next
+            # Check if end
             if node.get_row() == self._end[0] and node.get_col() == self._end[1]:
-                for tile in visited:
-                    bestPathTiles.add(tile[0:2])
+                for tile in path:
+                    bestPathTiles.add(tile)
                 continue
             # Ensure does not exceed path length
             if (node.get_score() + self.heuristic(node.get_row(), node.get_col())) > threshold:
                 continue
-            # Else, get successors
+            # Get successors
             for s in node.get_successors():
-                # Avoid backtracking - can't be shortest path if so
-                if s.get_state() in visited:
-                    continue
-                # Ensure valid
+                # Check if valid
                 if self._maze[s.get_row()][s.get_col()] == "#":
                     continue
-                frontier.append((visited + [s.get_state()], s))
+                # Avoid paths that are longer than existing paths 
+                if s.get_state() not in visited.keys() or s.get_score() <= visited[s.get_state()]:
+                    visited[s.get_state()] = s.get_score()
+                    frontier.append((path, s))
         
         for r, c in bestPathTiles:
             self._maze[r] = self._maze[r][:c] + "O" + self._maze[r][c + 1:]
         for line in self._maze:
             print(line)
-        
-        return len(bestPathTiles)
+
+        print(len(bestPathTiles))
+
+
 
 def main():
     maze = Maze(INPUT)
