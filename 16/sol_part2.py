@@ -1,14 +1,12 @@
 # itoombes, Advent of Code 2024
-# Day 16
-
+# Day 16 
 from enum import Enum
-import heapq
-
+import heapq 
 # Inputs
 MAZE_0 = "input.txt"
 MAZE_1 = "dummyinput.txt"
 MAZE_2 = "testinput.txt"
-INPUT = MAZE_1
+INPUT = MAZE_0 
 
 class Compass(Enum):
     N = 0
@@ -16,58 +14,38 @@ class Compass(Enum):
     S = 2
     W = 3
 
-class MazeNode():
-    def __init__(self, row, col, direction, score):
-        self._row = row
-        self._col = col
+class MazeNode(): 
+    def __init__(self, row, col, direction, score): 
+        self._row = row 
+        self._col = col 
         self._direction = direction
         self._score = score
-
-    def __str__(self):
+    def __str__(self): 
         return f"({self._score}, ({self._row}, {self._col}, {self._direction}))"
-    
-    def get_row(self):
+    def get_row(self): 
         return self._row
-
     def get_col(self):
-        return self._col
-
+        return self._col 
     def get_state(self):
         return (self._row, self._col, self._direction)
-
-    def get_score(self):
+    def get_score(self): 
         return self._score
-
-    def cw(self):
-        if self._direction == Compass.N:
-            return Compass.E
-        if self._direction == Compass.E:
-            return Compass.S
-        if self._direction == Compass.S:
-            return Compass.W
-        if self._direction == Compass.W:
-            return Compass.N
-    def ccw(self):
-        if self._direction == Compass.N:
-            return Compass.W
-        if self._direction == Compass.E:
-            return Compass.N
-        if self._direction == Compass.S:
-            return Compass.E
-        if self._direction == Compass.W:
-            return Compass.S
-
-    def get_successors(self):
-        # Update movement
-        nextRow, nextCol = self._row, self._col
-        if self._direction == Compass.N:
-            nextRow -= 1
-        elif self._direction == Compass.E:
-            nextCol += 1
-        elif self._direction == Compass.S:
-            nextRow += 1
-        elif self._direction == Compass.W:
-            nextCol -= 1
+    def cw(self): 
+        if self._direction == Compass.N: return Compass.E 
+        if self._direction == Compass.E: return Compass.S 
+        if self._direction == Compass.S: return Compass.W 
+        if self._direction == Compass.W: return Compass.N 
+    def ccw(self): 
+        if self._direction == Compass.N: return Compass.W
+        if self._direction == Compass.E: return Compass.N
+        if self._direction == Compass.S: return Compass.E
+        if self._direction == Compass.W: return Compass.S 
+    def get_successors(self): # Update movement
+        nextRow, nextCol = self._row, self._col 
+        if self._direction == Compass.N: nextRow -= 1
+        elif self._direction == Compass.E: nextCol += 1
+        elif self._direction == Compass.S: nextRow += 1
+        elif self._direction == Compass.W: nextCol -= 1
 
         # Return successors
         return [MazeNode(nextRow, nextCol, self._direction, self._score + 1),
@@ -150,13 +128,13 @@ class Maze():
         while len(frontier) > 0:
             visited, node = frontier.pop(0)
             print(node)
-            # Ensure does not exceed path length
-            if node.get_score() > threshold:
-                continue
             # If valid path, add the tiles in the path to the next
-            if node.get_score() == threshold:
+            if node.get_row() == self._end[0] and node.get_col() == self._end[1]:
                 for tile in visited:
                     bestPathTiles.add(tile[0:2])
+                continue
+            # Ensure does not exceed path length
+            if node.get_score() >= threshold:
                 continue
             # Else, get successors
             for s in node.get_successors():
@@ -173,7 +151,7 @@ class Maze():
         for line in self._maze:
             print(line)
         
-        return len(bestPathTiles) + 1
+        return len(bestPathTiles)
 
 def main():
     maze = Maze(INPUT)
