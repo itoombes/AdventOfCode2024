@@ -118,9 +118,10 @@ class Maze():
         while len(frontier) > 0:
             _, node = heapq.heappop(frontier)
             print(str(node))
-
+            # Check if end
             if node.get_row() == self._end[0] and node.get_col() == self._end[1]:
                 return node.get_score()
+
 
             # Add unvisited and valid nodes, and lower cost visited nodes, to frontier
             successors = node.get_successors()
@@ -130,6 +131,8 @@ class Maze():
                     continue
                 
                 # Check if not visited || visited at higher cost
+                if s.get_state() in visited.keys():
+                    print("!!! Already visited !!!")
                 if s.get_state() not in visited.keys() or s.get_score() < visited[s.get_state()]:
                     visited[s.get_state] = s.get_score()
                     heapq.heappush(frontier, (s.get_score() + self.heuristic(s.get_row(), s.get_col()), s))
