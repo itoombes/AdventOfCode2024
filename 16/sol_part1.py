@@ -58,6 +58,9 @@ class MazeNode():
                     MazeNode(self._row, self._col, S, self._cost + 1000),
                     MazeNode(self._row, self._col, N, self._cost + 1000)]
 
+    def __lt__(self, other):
+        return self.get_cost() < other.get_cost()
+
 
 class Maze():
     def __init__(self, file):
