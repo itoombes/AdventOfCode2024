@@ -27,13 +27,19 @@ class MazeNode():
         self._dir = direction
         self._cost = cost
 
+    def get_row(self):
+        return self._row
+    
+    def get_col(self):
+        return self._col
+
     def get_state(self):
         return (self._row, self._col, self._dir)
 
     def get_cost(self):
         return self._cost
 
-    def get_successors():
+    def get_successors(self):
         successors = list()
         if self._dir == N:
             return [MazeNode(self._row - 1, self._col, N, self._cost + 1),
@@ -82,7 +88,7 @@ class Maze():
     
     def manhatten_distance(self, row, col):
         rDist = self._end[0] - row
-        if rDist < 0: xDist *= -1
+        if rDist < 0: rDist *= -1
         cDist = self._end[1] - col
         if cDist < 0: cDist *= -1
         return rDist + rDist
@@ -97,16 +103,22 @@ class Maze():
             _, node = heapq.heappop(frontier)
 
             # Check if this node is the goal
-
+            if node.get_row() == self._end[0] and node.get_col() == self._end[1]:
+                return node.get_cost()
             # Add unvistied or visited at greater path cost successors
-
+            successors = node.get_successors()
+            for s in successors:
+                if s.get_state() not in visited.keys() or s.get_cost() < visited[s.get_state()]:
+                    visited[s.get_state()] = s.get_cost()
+                    heapq.heappush(frontier,
+                                   (s.get_cost() + self.manhatten_distance(s.get_row(), s.get_col()), s))
             
 
 
 def main():
     maze = Maze(INPUT)
     print(maze)
-    maze.solve()
+    print(maze.solve())
 
 
 if __name__ == "__main__":
