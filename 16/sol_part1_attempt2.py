@@ -23,6 +23,18 @@ class MazeNode():
         self._direction = direction
         self._score = score
     
+    def get_row(self):
+        return self._row
+
+    def get_col(self):
+        return self._col
+    
+    def get_state(self):
+        return (self._row, self._col, self._direction)
+
+    def get_score(self):
+        return self._score
+
     def cw(self):
         if self.direction == Compass.N:
             return Compass.E
@@ -47,17 +59,21 @@ class MazeNode():
         nextRow, nextCol = self._row, self._col
         if self.direction == Compass.N:
             nextRow -= 1
-        if self.direction == Compass.E:
+        elif self.direction == Compass.E:
             nextCol += 1
-        if self.direction == Compass.S:
+        elif self.direction == Compass.S:
             nextRow += 1
-        if self.direction == Compass.W:
+        elif self.direction == Compass.W:
             nextCol -= 1
 
         # Return successors
         return [MazeNode(nextRow, nextCol, self.direction, self._score + 1),
                 MazeNode(self._row, self._col, self.cw(), self._score + 1000),
                 MazeNode(self._row, self._col, self.ccw(), self._score + 1000)]
+    
+    def __lt__(self, other):
+        return self.get_score() < other.get_score()
+
 
 class Maze():
     def __init__(self, file):
