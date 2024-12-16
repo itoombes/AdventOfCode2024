@@ -1,6 +1,8 @@
 # itoombes, Advent of Code 2024
 # Day 16
 
+import heapq
+
 # Input
 MAZE_0 = "input.txt"
 MAZE_1 = "dummyinput.txt"
@@ -18,9 +20,42 @@ S = 2
 W = 3
 DEFAULT_DIR = E
 
+class MazeNode():
+    def __init__(self, row, col, direction, cost):
+        self._row = row
+        self._col = col
+        self._dir = direction
+        self._cost = cost
+
+    def get_state(self):
+        return (self._row, self._col, self._dir)
+
+    def get_cost(self):
+        return self._cost
+
+    def get_successors():
+        successors = list()
+        if self._dir == N:
+            return [MazeNode(self._row - 1, self._col, N, self._cost + 1),
+                    MazeNode(self._row, self._col, W, self._cost + 1000),
+                    MazeNode(self._row, self._col, E, self._cost + 1000)]
+        elif self._dir == E:
+            return [MazeNode(self._row - 1, self._col, E, self._cost + 1),
+                    MazeNode(self._row, self._col, N, self._cost + 1000),
+                    MazeNode(self._row, self._col, S, self._cost + 1000)]
+        elif self._dir == S:
+            return [MazeNode(self._row - 1, self._col, S, self._cost + 1),
+                    MazeNode(self._row, self._col, W, self._cost + 1000),
+                    MazeNode(self._row, self._col, E, self._cost + 1000)]
+        elif self._dir == W:
+            return [MazeNode(self._row - 1, self._col, W, self._cost + 1),
+                    MazeNode(self._row, self._col, S, self._cost + 1000),
+                    MazeNode(self._row, self._col, N, self._cost + 1000)]
+
+
 class Maze():
     def __init__(self, file):
-        self._maze, self._start = Maze.read_maze(file)
+        self._maze, self._start, self._end = Maze.read_maze(file)
     
     def __str__(self):
         string = ""
@@ -38,62 +73,40 @@ class Maze():
                 for c in range(0, len(line)):
                     if line[c] == START:
                         start = (r, c)
+            elif "E" in line:
+                for c in range(0, len(line)):
+                    if line[c] == END:
+                        end = (r, c)
             maze.append(line)
-        return (maze, start)
+        return (maze, start, end)
     
-    def bfs_solve(self):
-        # Storing nodes as (<parent>, <row>, <col>, <direction>, <explored>, <score>)
-        frontier = [(None, self._start[0], self._start[1], DEFAULT_DIR, [(self._start[0], self._start[1], DEFAULT_DIR),], 0),]
-        solutions = list() 
+    def manhatten_distance(self, row, col):
+        rDist = self._end[0] - row
+        if rDist < 0: xDist *= -1
+        cDist = self._end[1] - col
+        if cDist < 0: cDist *= -1
+        return rDist + rDist
+
+    def solve(self):
+        # Based on Univesity of Queensland COMP3702 A* Code
+        initNode = MazeNode(self._start[0], self._start[1], DEFAULT_DIR, 0)
+        frontier = [(0, initNode),]
+        heapq.heapify(frontier)
+        visited = {initNode.get_state() : 0}
         while len(frontier) > 0:
-            node = frontier.pop(0)
-            parent, r, c, direction, explored, score = node
-            # Go thru next steps 
-            CW = CCW = None
-            nextR, nextC = r, c
-            if direction == N:
-                CW = E
-                CCW = W
-                nextR -= 1
-            elif direction == E:
-                CW = S
-                CCW = N
-                nextC += 1
-            elif direction == S:
-                CW = W
-                CCW = E
-                nextR += 1
-            elif direction == W:
-                CW = N
-                CCW = S
-                nextC -= 1
-            # Note will never be out of bounds - would hit a wall first
-            # Note that if have one motion to solution, no possible shorter path
-            # Check if solution
-            if self._maze[nextR][nextC] == END:
-                score += 1
-                solutions.append(score)
-                continue
-            # If not part of solution and on map
-            if self._maze[nextR][nextC] == FREE and (nextR, nextC, direction) not in explored:
-                score += 1
-                explored.append((nextR, nextC, direction))
-                frontier.append((parent, nextR, nextC, direction, explored, score))
-            # Add next directions
-            score += 1000
-            if (r, c, CW) not in explored:
-                explored.append((r, c, CW))
-                frontier.append((parent, r, c, CW, explored, score))
-            if (r, c, CCW) not in explored:
-                explored.append((r, c, CCW))
-                frontier.append((parent, r, c, CCW, explored, score))
-        print(solutions)
+            _, node = heapq.heappop(frontier)
+
+            # Check if this node is the goal
+
+            # Add unvistied or visited at greater path cost successors
+
+            
 
 
 def main():
     maze = Maze(INPUT)
     print(maze)
-    maze.bfs_solve()
+    maze.solve()
 
 
 if __name__ == "__main__":
