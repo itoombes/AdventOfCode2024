@@ -8,7 +8,7 @@ import heapq
 MAZE_0 = "input.txt"
 MAZE_1 = "dummyinput.txt"
 MAZE_2 = "testinput.txt"
-INPUT = MAZE_0
+INPUT = MAZE_2
 
 class Compass(Enum):
     N = 0
@@ -31,7 +31,7 @@ class MazeNode():
 
     def get_col(self):
         return self._col
-    
+
     def get_state(self):
         return (self._row, self._col, self._direction)
 
@@ -97,14 +97,41 @@ class Maze():
                     if line[c] == "E":
                         self._end = (r, c)
             self._maze.append(line)
+        
+        string = ""
+        for line in self._maze:
+            string += line + "\n"
+        print(string)
     
     def ucs_solve(self):
         initNode = MazeNode(self._start[0], self._start[1], Compass.E, 0)
+        frontier = [initNode]
+        heapq.heapify(frontier)
+        visited = {initNode.get_state() : initNode.get_score()}
+        while len(frontier) > 0:
+            node = heapq.heappop(frontier)
+            print(str(node))
 
+            if node.get_row() == self._end[0] and node.get_col() == self._end[1]:
+                return node.get_score()
+
+            # Add unvisited and valid nodes, and lower cost visited nodes, to frontier
+            successors = node.get_successors()
+            for s in successors:
+                # Ensure valid
+                if self._maze[s.get_row()][s.get_col()] == "#":
+                    continue
+                
+                # Check if not visited || visited at higher cost
+                if s.get_state() not in visited.keys() or s.get_score() < visited[s.get_state()]:
+                    visited[s.get_state] = s.get_score()
+                    heapq.heappush(frontier, s)
+        return None
 
 
 def main():
     maze = Maze(INPUT)
+    input()
     print(maze.ucs_solve())
 
 if __name__ == "__main__":
