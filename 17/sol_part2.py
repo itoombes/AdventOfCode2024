@@ -114,7 +114,7 @@ def swarm_calc(start, end, opcodes):
 def main():
     start = int(argv[1])
     end = int(argv[2])
-    _, opcodes = read_from_file(PALINDROME)
+    _, opcodes = read_from_file(INPUT)
     print(swarm_calc(start, end, opcodes))
 
 if __name__ == "__main__":
