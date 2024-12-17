@@ -3,6 +3,7 @@
 
 INPUT = "input.txt"
 DUMMY = "dummyinput.txt"
+DEBUG = True
 
 def read_from_file(file):
     f = open(file, "r")
@@ -25,30 +26,50 @@ class Machine():
 
     def run(self):
         while True:
-            print(f"Register A: {self._A}")
-            print(f"Register B: {self._B}")
-            print(f"Register C: {self._C}")
-            print(f"Program: {self._opcodes}")
-            print(f"Opcount: {self._opcount}")
+            if DEBUG:
+                print(f"Register A: {self._A}")
+                print(f"Register B: {self._B}")
+                print(f"Register C: {self._C}")
+                print(f"Program: {self._opcodes}")
+                print(f"Opcount: {self._opcount} | {self._opcodes[self._opcount]}")
             print(f"Output: {self._out}")
-            input()
+            if DEBUG:
+                input()
             self.next_instruction()
+            if self._opcount < 0 or self._opcount >= len(self._opcodes) - 1:
+                print("Halt")
+                return
     
     def next_instruction(self):
-        if self._opcount >= len(self._opcodes) - 1:
-            print("HALT!")
-            exit()
+        # Extract current opcode
         opcode = self._opcodes[self._opcount]
         self._opcount += 1
-        if opcode == 0: self.adv()
-        elif opcode == 1: self.bxl()
-        elif opcode == 2: self.bst()
-        elif opcode == 3: self.jnz()
-        elif opcode == 4: self.bxc()
-        elif opcode == 5: self.out()
-        elif opcode == 6: self.bdv()
-        elif opcode == 7: self.cdv()
-        else: raise ValueError(f"Illegal opcode! {opcode}")
+        # Extract operands
+        literal = self._opcodes[self._opcount]
+        combo = self.get_combo_operand() # Increments opcount
+        # Repeated math
+        div = self._A // (2 ** combo) 
+        mod = combo % 8
+        # Opcode instructions
+        if opcode == 0: # ADV
+            self._A = div
+        elif opcode == 1: # BXL
+            self._B = self._B ^ literal
+        elif opcode == 2: # BST
+            self._B = mod
+        elif opcode == 3: # JNZ
+            if self._A != 0:
+                self._opcount = literal
+        elif opcode == 4: # BXC
+            self._B = self._B ^ self._C
+        elif opcode == 5: # OUT
+            self._out.append(mod) 
+        elif opcode == 6: # BDV
+            self._B = div
+        elif opcode == 7: # CDV
+            self._C = div
+        else:
+            raise ValueError(f"Illegal opcode! {opcode}")
 
     def get_combo_operand(self):
         operand = self._opcodes[self._opcount]
@@ -62,41 +83,6 @@ class Machine():
         if operand == 6:
             return self._C
         raise ValueError("Invalid combo value!")
-
-    def get_literal_operand(self):
-        self._opcount += 1
-        return self._opcodes[self._opcount - 1]
-
-    def adv(self):
-        # Perform division
-        self._A = self._A // (2 ** self.get_combo_operand()) 
-
-    def bxl(self):
-        # Bitwise XOR
-        self._B ^= self.get_literal_operand()
-
-    def bst(self):
-        # Modulo 8
-        self._B = self.get_combo_operand() % 8
-
-    def jnz(self):
-        if self._A == 0:
-            return
-        self._opcount = self.get_literal_operand()
-
-    def bxc(self):
-        _ = self.get_literal_operand()
-        self._B ^= self._C
-
-    def out(self):
-        self._out.append(self.get_combo_operand() % 8)
-
-    def bdv(self):
-        self._B = self._A // (2 ** self.get_combo_operand())
-
-    def cdv(self):
-        self._C = self._B // (2 ** self.get_combo_operand())
-
 
 def main():
     a, opcodes = read_from_file(INPUT)
