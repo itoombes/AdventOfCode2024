@@ -22,15 +22,36 @@ class Machine():
         self._opcodes = opcodes
         self._opcount = 0
         self._out = list()
+
+    def run(self):
+        while True:
+            print(f"Register A: {self._A}")
+            print(f"Register B: {self._B}")
+            print(f"Register C: {self._C}")
+            print(f"Program: {self._opcodes}")
+            print(f"Opcount: {self._opcount}")
+            print(f"Output: {self._out}")
+            input()
+            self.next_instruction()
     
     def next_instruction(self):
+        if self._opcount >= len(self._opcodes) - 1:
+            print("HALT!")
+            exit()
         opcode = self._opcodes[self._opcount]
         self._opcount += 1
-        # TODO : Parse the opcode
-        pass
+        if opcode == 0: self.adv()
+        elif opcode == 1: self.bxl()
+        elif opcode == 2: self.bst()
+        elif opcode == 3: self.jnz()
+        elif opcode == 4: self.bxc()
+        elif opcode == 5: self.out()
+        elif opcode == 6: self.bdv()
+        elif opcode == 7: self.cdv()
+        else: raise ValueError(f"Illegal opcode! {opcode}")
 
     def get_combo_operand(self):
-        opcode = self._opcodes[self._opcount]
+        operand = self._opcodes[self._opcount]
         self._opcount += 1
         if operand >= 0 and operand < 4:
             return operand
@@ -78,7 +99,9 @@ class Machine():
 
 
 def main():
-    machine = Machine(read_from_file(DUMMY))
+    a, opcodes = read_from_file(INPUT)
+    machine = Machine(a, opcodes)
+    machine.run()
 
 if __name__ == "__main__":
     main()
