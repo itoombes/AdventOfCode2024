@@ -21,6 +21,7 @@ class Machine():
         self._C = 0
         self._opcodes = opcodes
         self._opcount = 0
+        self._out = list()
     
     def next_instruction(self):
         opcode = self._opcodes[self._opcount]
@@ -28,7 +29,7 @@ class Machine():
         # TODO : Parse the opcode
         pass
 
-    def get_combo_value(self):
+    def get_combo_operand(self):
         opcode = self._opcodes[self._opcount]
         self._opcount += 1
         if operand >= 0 and operand < 4:
@@ -41,9 +42,40 @@ class Machine():
             return self._C
         raise ValueError("Invalid combo value!")
 
+    def get_literal_operand(self):
+        self._opcount += 1
+        return self._opcodes[self._opcount - 1]
+
     def adv(self):
         # Perform division
-        self._A = self._A // (2 ** self.get_combo_value()) 
+        self._A = self._A // (2 ** self.get_combo_operand()) 
+
+    def bxl(self):
+        # Bitwise XOR
+        self._B ^= self.get_literal_operand()
+
+    def bst(self):
+        # Modulo 8
+        self._B = self.get_combo_operand() % 8
+
+    def jnz(self):
+        if self._A == 0:
+            return
+        self._opcount = self.get_literal_operand()
+
+    def bxc(self):
+        _ = self.get_literal_operand()
+        self._B ^= self._C
+
+    def out(self):
+        self._out.append(self.get_combo_operand() % 8)
+
+    def bdv(self):
+        self._B = self._A // (2 ** self.get_combo_operand())
+
+    def cdv(self):
+        self._C = self._B // (2 ** self.get_combo_operand())
+
 
 def main():
     machine = Machine(read_from_file(DUMMY))
