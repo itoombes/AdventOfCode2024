@@ -50,23 +50,34 @@ class Machine():
         # Repeated math
         div = self._A // (2 ** combo) 
         mod = combo % 8
+
+        if DEBUG:
+            print(f"Literal : {literal}, Combo : {combo}")
         # Opcode instructions
         if opcode == 0: # ADV
+            if DEBUG: print("ADV")
             self._A = div
         elif opcode == 1: # BXL
+            if DEBUG: print("BXL")
             self._B = self._B ^ literal
         elif opcode == 2: # BST
+            if DEBUG: print("BST")
             self._B = mod
         elif opcode == 3: # JNZ
+            if DEBUG: print("JNZ")
             if self._A != 0:
                 self._opcount = literal
         elif opcode == 4: # BXC
+            if DEBUG: print("BXC")
             self._B = self._B ^ self._C
         elif opcode == 5: # OUT
+            if DEBUG: print("OUT")
             self._out.append(mod) 
         elif opcode == 6: # BDV
+            if DEBUG: print("BDV")
             self._B = div
         elif opcode == 7: # CDV
+            if DEBUG: print("CDV")
             self._C = div
         else:
             raise ValueError(f"Illegal opcode! {opcode}")
