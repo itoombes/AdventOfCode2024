@@ -31,7 +31,7 @@ while True:
     a0 += 1
 
 
-for i in range(0, len[PROGRAM]):
+for i in range(0, len(PROGRAM)):
     print(((((a0 & 7) ^ 1) ^ (ai // (2 ** ((a0 & 7) ^ 1)))) ^ 6) & 7)
     a0 = a0 // 8
 print(a0)
