@@ -16,13 +16,12 @@ def perform_iteration(a):
     """
     Returns the output and the next A
     """
-    b = (a & 7) ^ 1
-    c = a // (2 ** b)
-    b = ((b ^ c) ^ 6) & 7
+    b = (((((a & 7) ^ 1) ^ (a // (2 ** ((a & 7) ^ 1)))) ^ 6) & 7)
     a = a // 8
     return (a, b)
 
 a = 30899381
+print(len(PROGRAM))
 while True:
     a, o = perform_iteration(a)
     print(o)
