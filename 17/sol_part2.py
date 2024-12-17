@@ -1,10 +1,12 @@
 # itoombes, Advent of Code 2024
 # Day 17
 
+from sys import argv
+
 INPUT = "input.txt"
 DUMMY = "dummyinput.txt"
 PALINDROME = "testinput.txt"
-DEBUG = FALSE 
+DEBUG = False
 
 def read_from_file(file):
     f = open(file, "r")
@@ -17,8 +19,9 @@ def read_from_file(file):
     return a, opcodes
 
 class Machine():
-    def __init__(self, a_reg, opcodes):
-        self._A = a_reg
+    def __init__(self, a, opcodes):
+        self._initA = a
+        self._A = a
         self._B = 0
         self._C = 0
         self._opcodes = opcodes
@@ -33,13 +36,17 @@ class Machine():
                 print(f"Register C: {self._C}")
                 print(f"Program: {self._opcodes}")
                 print(f"Opcount: {self._opcount} | {self._opcodes[self._opcount]}")
-            print(f"Output: {self._out}")
-            if DEBUG:
+                print(f"Output: {self._out}")
                 input()
             self.next_instruction()
             if self._opcount < 0 or self._opcount >= len(self._opcodes) - 1:
                 print("Halt")
-                return
+                return self._out
+
+            for i in range(0, len(self._out)):
+                if self._out[i] != self._opcodes[i]:
+                    print(f"{self._initA} : {self._out}")
+                    return None
     
     def next_instruction(self):
         # Extract current opcode
@@ -52,8 +59,7 @@ class Machine():
         div = self._A // (2 ** combo) 
         mod = combo % 8
 
-        if DEBUG:
-            print(f"Literal : {literal}, Combo : {combo}")
+        if DEBUG: print(f"Literal : {literal}, Combo : {combo}")
         # Opcode instructions
         if opcode == 0: # ADV
             if DEBUG: print("ADV")
@@ -96,11 +102,20 @@ class Machine():
             return self._C
         raise ValueError("Invalid combo value!")
 
+def swarm_calc(start, end, opcodes):
+    a = start
+    while a <= end:
+        machine = Machine(a, opcodes)
+        out = machine.run()
+        if out == opcodes:
+            return a
+        a += 1
+
 def main():
-    opcodes = read_from_file(PALINDROME)
-    a = 2024
-    machine = Machine(a, opcodes)
-    machine.run()
+    start = int(argv[1])
+    end = int(argv[2])
+    _, opcodes = read_from_file(PALINDROME)
+    print(swarm_calc(start, end, opcodes))
 
 if __name__ == "__main__":
     main()
