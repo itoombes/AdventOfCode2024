@@ -15,10 +15,10 @@ while i > 0:
         a0 = a << 3
         for least_sig_bits in range(0, 8):
             ai = a0 + least_sig_bits
-            print(bin(ai))
             out = (((least_sig_bits ^ 1) ^ (ai >> ((least_sig_bits ^ 1))) ^ 6) & 7)
             if out == program[i]:
                 nextValid.append(ai)
+            print(f"{bin(ai)}, {out}, {program[i]}")
     currentValid = nextValid
     print(currentValid)
     input()
