@@ -21,12 +21,12 @@ class World():
     def get_corrupted_bytes(file, size):
         f = open(file, "r")
         lines = f.readlines()
-        corrupted = list()
+        corrupted = set()
         for i in range(0, size):
             x, y = lines[i].split(",")
             x = int(x)
             y = int(y)
-            corrupted.append((x, y))
+            corrupted.add((x, y))
         i = size
         nextCorrupted = list()
         while i < len(lines):
@@ -67,6 +67,16 @@ class World():
                     visited.add(s)
                     frontier.append((copy.deepcopy(nodeVisited), s))
         return None
+
+    def find_first_block(self):
+        currentShortestPath = self.bfs_solve()
+        while currentShortestPath is not None:
+            nextByte = self._next_corrupted.pop(0)
+            self._corrupted.add(nextByte)
+            if nextByte not in currentShortestPath:
+                continue
+            currentShortestPath = self.bfs_solve()
+        return nextByte
             
 
     def __str__(self):
@@ -84,6 +94,7 @@ def main():
     else:
         world = World(INPUT_FILE, INPUT_CAPACITY, INPUT_BYTES)
     print(world)
+    print(world.find_first_block())
 
 if __name__ == "__main__":
     main()
