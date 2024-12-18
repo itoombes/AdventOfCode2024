@@ -12,9 +12,10 @@ i = len(program) - 1
 while i > 0:
     nextValid = list()
     for a in currentValid:
-        a << 3
+        a0 = a << 3
         for least_sig_bits in range(0, 8):
-            ai = a + least_sig_bits
+            ai = a0 + least_sig_bits
+            print(bin(ai))
             out = (((least_sig_bits ^ 1) ^ (ai >> ((least_sig_bits ^ 1))) ^ 6) & 7)
             if out == program[i]:
                 nextValid.append(ai)
@@ -23,7 +24,9 @@ while i > 0:
     input()
     i -= 1
 
+print("SOLVED!")
 print(currentValid)
+print(min(currentValid))
 
 # Can go backwards over this 
 # Know that >> 3 at end of every 3, so build up A backwards

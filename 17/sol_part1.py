@@ -98,7 +98,7 @@ class Machine():
 
 def main():
     _, opcodes = read_from_file(INPUT)
-    a = 7 
+    a = 30979956626199
     machine = Machine(a, opcodes)
     machine.run()
 
