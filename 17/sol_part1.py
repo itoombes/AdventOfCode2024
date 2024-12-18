@@ -4,7 +4,7 @@
 INPUT = "input.txt"
 DUMMY = "dummyinput.txt"
 PALINDROME = "testinput.txt"
-DEBUG = FALSE 
+DEBUG = True 
 
 def read_from_file(file):
     f = open(file, "r")
@@ -97,8 +97,8 @@ class Machine():
         raise ValueError("Invalid combo value!")
 
 def main():
-    opcodes = read_from_file(PALINDROME)
-    a = 2024
+    _, opcodes = read_from_file(INPUT)
+    a = 7 
     machine = Machine(a, opcodes)
     machine.run()
 
