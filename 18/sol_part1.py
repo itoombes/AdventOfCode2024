@@ -1,9 +1,9 @@
 # itoombes, Advent of Code 2024
 # Day 18
 
-import heapq
+import copy
 
-DUMMY = 1
+DUMMY = 0
 INPUT_FILE = "input.txt"
 DUMMY_FILE = "dummyinput.txt"
 INPUT_CAPACITY = 71 
@@ -48,16 +48,18 @@ class World():
         while len(frontier) > 0:
             nodeVisited, coords = frontier.pop(0)
             nodeVisited.add(coords)
-            print(coords)
             # Detect end
             if coords == (self._capacity - 1, self._capacity - 1):
                 return nodeVisited
             for s in self.get_adjacent(coords):
                 if s not in visited:
+                    print(f"Visited : {s}")
                     visited.add(s)
-                    frontier.append((nodeVisited, s))
+                    frontier.append((copy.deepcopy(nodeVisited), s))
         return None
             
+    def get_path_len(self):
+        return len(self._shortest_path)
 
     def __str__(self):
         strings = ["." * self._capacity] * self._capacity
@@ -76,6 +78,7 @@ def main():
     else:
         world = World(INPUT_FILE, INPUT_CAPACITY, INPUT_BYTES)
     print(world)
+    print(world.get_path_len() - 1) # want steps, not tiles
 
 if __name__ == "__main__":
     main()
