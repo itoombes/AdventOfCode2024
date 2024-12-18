@@ -14,7 +14,8 @@ INPUT_BYTES = 1024
 class World():
     def __init__(self, file, capacity, nBytes):
         self._corrupted = World.get_corrupted_bytes(file, nBytes)
-        self._capacity = capacity 
+        self._capacity = capacity
+        self._shortest_path = self.bfs_solve()
 
     def get_corrupted_bytes(file, size):
         f = open(file, "r")
@@ -27,49 +28,43 @@ class World():
             corrupted.append((x, y))
         return corrupted 
 
-    def heuristic(self, coords):
-        x, y = coords
-        # Want distance to final walls
-        # So, x <= self._capacity, y <= self._capacity
-        dx = self._capacity - x - 1
-        dy = self._capacity - y - 1
-        return dx + dy
-
-    def get_adjacent(self, cost, coords):
+    def get_adjacent(self, coords):
         x, y = coords
         adjacent = list()
         for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
             if nx < 0 or ny < 0 or nx >= self._capacity or ny >= self._capacity:
-                if (nx, ny) not in self._corrupted:
-                    adjacent.append((cost + 1, (nx, ny)))
+                continue
+            if (nx, ny) not in self._corrupted:
+                adjacent.append((nx, ny))
         return adjacent
 
-    def astar_solve(self):
-        # Tuples in form (<path cost>, (<x>, <y>))
-        start = (0, (0, 0))
-        frontier = [(self.heuristic(start[1]), start)]
-        heapq.heapify(frontier)
-        visited = {start[1] : 0}
+    def bfs_solve(self):
+        # Return the coords of the elements in the shortest path
+        start = (set(), (0, 0))
+        frontier = [start,]
+        visited = set()
+        visited.add((0,0))
+        
         while len(frontier) > 0:
-            _, node = heapq.heappop(frontier)
-            print(node)
-            # Check if goal
-            if node[1] == (self._capacity, self._capacity):
-                return node[0]
-            # Add successors with lower path costs || unvisited to frontier
-            successors = self.get_adjacent(node[0], node[1])
-            for s in successors:
-                if s[1] not in visited.keys() or s[0] < visited[s[1]]:
-                    visited[s[1]] = s[0]
-                    heapq.heappush(frontier, (s[0] + self.heuristic(s[1]), s))
+            nodeVisited, coords = frontier.pop(0)
+            nodeVisited.add(coords)
+            print(coords)
+            # Detect end
+            if coords == (self._capacity - 1, self._capacity - 1):
+                return nodeVisited
+            for s in self.get_adjacent(coords):
+                if s not in visited:
+                    visited.add(s)
+                    frontier.append((nodeVisited, s))
         return None
+            
 
     def __str__(self):
         strings = ["." * self._capacity] * self._capacity
-        print(len(strings))
-        print(len(strings[0]))
         for x, y in self._corrupted:
             strings[y] = strings[y][:x] + "#" + strings[y][x+1:]
+        for x, y in self._shortest_path:
+            strings[y] = strings[y][:x] + "O" + strings[y][x+1:]
         out = ""
         for string in strings:
             out += string + "\n"
@@ -81,7 +76,6 @@ def main():
     else:
         world = World(INPUT_FILE, INPUT_CAPACITY, INPUT_BYTES)
     print(world)
-    print(world.astar_solve())
 
 if __name__ == "__main__":
     main()
