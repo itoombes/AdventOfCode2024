@@ -1,6 +1,8 @@
 # itoombes, Advent of Code 2024
 # Day 18
 
+import heapq
+
 DUMMY = 0
 INPUT_FILE = "input.txt"
 DUMMY_FILE = "dummyinput.txt"
@@ -24,6 +26,24 @@ class World():
             y = int(y)
             corrupted.append((x, y))
         return corrupted 
+
+    def heuristic(self, x, y):
+        # Want distance to final walls
+        # So, x <= self._capacity, y <= self._capacity
+        dx = self._capacity - x - 1
+        dy = self._capacity - y - 1
+        return dx + dy
+
+    def get_adjacent(self, x, y):
+        adjacent = list()
+        for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+            if nx < 0 or ny < 0 or nx >= self._capacity or ny >= self._capacity:
+                if (nx, ny) not in self._corrupted:
+                    adjacent.append((nx, ny))
+        return adjacent
+
+    def astar_solve(self):
+        frontier = 
 
     def __str__(self):
         strings = ["." * self._capacity] * self._capacity
