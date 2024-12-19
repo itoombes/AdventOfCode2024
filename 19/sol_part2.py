@@ -39,7 +39,6 @@ def check_possible(design, pattern_map):
         if design[start] not in pattern_map.keys():
             continue
         for towel in pattern_map[design[start]]:
-            towelLen = len(towel)
             # Ensure not over size
             if start+len(towel) > len(design) + 1:
                 continue
@@ -57,27 +56,27 @@ def check_possible(design, pattern_map):
 
 def count_possible_arrangements(design, pattern_map):
     print(f"Evaluating {design}")
+    pattern_starts = [0,]
+    edges = {0: set()}
+    while len(pattern_starts) > 0:
+        start = pattern_starts.pop(0)
+        if design[start] not in pattern_map.keys():
+            continue
+        for towel in pattern_map[design[start]]:
+            if start+len(towel) > len(design) + 1:
+                continue
+            if design[start:start+len(towel)] != towel:
+                continue
+            if start+len(towel) == len(design):
+                edges[start].add("E")
+            else:
+                edges[start].add(start+len(towel))
+                if start+len(towel) not in edges.keys():
+                    pattern_starts.append(start+len(towel))
+                    edges[start+len(towel)] = set()
+    print(edges)
     input()
-    candidates = list()
-    for towel in pattern_map[design[0]]:
-        if design[0:len(towel)] == towel:
-            candidates.append(towel)
-    matches = list()
-    while len(candidates) > 0:
-        c = candidates.pop(0)
-        if design[len(c)] in pattern_map:
-            for towel in pattern_map[design[len(c)]]:
-                nC = c + towel
-                if len(nC) > len(design):
-                    continue
-                if nC != design[0:len(nC)]:
-                    continue
-                if len(nC) == len(design):
-                    matches.append(nC)
-                else:
-                    candidates.append(nC)
-    print(len(matches))
-    return len(matches)
+        
 
 def main():
     patterns, designs = extract_data()
