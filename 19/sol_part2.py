@@ -56,62 +56,40 @@ def check_possible(design, pattern_map):
 
     return False
 
-def count_paths(dag, vertex):
-    if vertex == "E":
-        return 1
-    count = 0
-    for v in dag[vertex]:
-        count += count_paths(dag, v)
-    return count
-
 def count_possible_arrangements(design, pattern_map):
     print(f"Evaluating {design}")
-    pattern_starts = [0,]
-    edges = {0: set()}
-    while len(pattern_starts) > 0:
-        start = pattern_starts.pop(0)
-        if design[start] not in pattern_map.keys():
-            continue
+    waysToPoint = {0: 1}
+    frontier = [0,]
+    frontier.append(0)
+    while len(frontier) > 0:
+        #print(f"Frontier : {frontier}")
+        #print(f"Ways to point : {waysToPoint}")
+        start = min(frontier) # MUST go from SMALL TO LARGE
+        frontier.remove(start)
         for towel in pattern_map[design[start]]:
+            # Make sure not oversize
             if start+len(towel) > len(design) + 1:
                 continue
             if design[start:start+len(towel)] != towel:
                 continue
             if start+len(towel) == len(design):
-                edges[start].add("E")
+                if "E" not in waysToPoint.keys():
+                    waysToPoint["E"] = waysToPoint[start] 
+                else:
+                    waysToPoint["E"] += waysToPoint[start]
+                continue
+            if start+len(towel) not in waysToPoint.keys():
+                waysToPoint[start+len(towel)] = waysToPoint[start]
             else:
-                edges[start].add(start+len(towel))
-                if start+len(towel) not in edges.keys():
-                    pattern_starts.append(start+len(towel))
-                    edges[start+len(towel)] = set()
-    print(edges)
-    #input()
-    # Prune the tree by removing all entries that don't have children
-    pruning = True
-    while pruning:
-        pruning = False
-        deadBranches = set()
-        for k in edges.keys():
-            if len(edges[k]) == 0:
-                deadBranches.add(k)
-                pruning = True
-        for branch in deadBranches:
-            edges.pop(branch)
-        if pruning:
-            for k in edges.keys():
-                for b in deadBranches:
-                    if b in edges[k]:
-                        edges[k].remove(b)
-    print(edges) 
-    #input()
+                waysToPoint[start+len(towel)] += waysToPoint[start]
+            if start+len(towel) not in frontier:
+                frontier.append(start+len(towel))
 
-    # Determine the depth of each node
-    count = count_paths(edges, 0) 
+    print(waysToPoint)
+    input()
 
-    print(count)
     #input()
-
-    return count
+    return waysToPoint["E"]
 
 def main():
     patterns, designs = extract_data()
