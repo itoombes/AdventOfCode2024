@@ -1,6 +1,8 @@
 # itoombes, Advent of Code 2024
 # Day 19
 
+import copy
+
 DUMMY = 0
 
 if DUMMY:
@@ -76,7 +78,7 @@ def count_possible_arrangements(design, pattern_map):
                     edges[start+len(towel)] = set()
     print(edges)
     input()
-    # Find an entry on the graph with no children
+    # Prune the tree by removing all entries that don't have children
     pruning = True
     while pruning:
         pruning = False
@@ -94,7 +96,15 @@ def count_possible_arrangements(design, pattern_map):
                         edges[k].remove(b)
     print(edges) 
     input()
+    # Now, count the possible paths
+    count = 1
+    for k in edges.keys():
+        if len(edges[k]) > 1:
+            count += len(edges[k])
+    print(count)
+    input()
 
+    return count
 
 def main():
     patterns, designs = extract_data()
