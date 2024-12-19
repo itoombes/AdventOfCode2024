@@ -77,7 +77,7 @@ def count_possible_arrangements(design, pattern_map):
                     pattern_starts.append(start+len(towel))
                     edges[start+len(towel)] = set()
     print(edges)
-    input()
+    #input()
     # Prune the tree by removing all entries that don't have children
     pruning = True
     while pruning:
@@ -95,14 +95,21 @@ def count_possible_arrangements(design, pattern_map):
                     if b in edges[k]:
                         edges[k].remove(b)
     print(edges) 
-    input()
+    #input()
     # Now, count the possible paths
-    count = 1
-    for k in edges.keys():
-        if len(edges[k]) > 1:
-            count += len(edges[k])
+    # Trying to modify BFS for this
+    frontier = [0,]
+    count = 0
+    while len(frontier) > 0:
+        node = frontier.pop(0)
+        print(f"\t{frontier}")
+        if node == "E":
+            count += 1
+            continue
+        for s in edges[node]:
+            frontier.append(s)
     print(count)
-    input()
+    #input()
 
     return count
 
