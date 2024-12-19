@@ -60,12 +60,12 @@ def count_possible_arrangements(design, pattern_map):
     print(f"Evaluating {design}")
     waysToPoint = {0: 1}
     frontier = [0,]
-    frontier.append(0)
     while len(frontier) > 0:
-        #print(f"Frontier : {frontier}")
-        #print(f"Ways to point : {waysToPoint}")
+        print(f"Frontier : {frontier}")
+        print(f"Ways to point : {waysToPoint}")
         start = min(frontier) # MUST go from SMALL TO LARGE
         frontier.remove(start)
+        print(f"Start : {start} | {waysToPoint[start]}")
         for towel in pattern_map[design[start]]:
             # Make sure not oversize
             if start+len(towel) > len(design) + 1:
@@ -86,7 +86,6 @@ def count_possible_arrangements(design, pattern_map):
                 frontier.append(start+len(towel))
 
     print(waysToPoint)
-    input()
 
     #input()
     return waysToPoint["E"]
