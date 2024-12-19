@@ -3,7 +3,7 @@
 
 import copy
 
-DUMMY = 0
+DUMMY = 1
 
 if DUMMY:
     PATTERNS = "dummy1.txt"
@@ -97,17 +97,21 @@ def count_possible_arrangements(design, pattern_map):
     print(edges) 
     #input()
     # Now, count the possible paths
-    # Trying to modify BFS for this
-    frontier = [0,]
-    count = 0
-    while len(frontier) > 0:
-        node = frontier.pop(0)
-        print(f"\t{frontier}")
-        if node == "E":
-            count += 1
-            continue
-        for s in edges[node]:
-            frontier.append(s)
+
+    # Get the in-degree for each node
+    inDeg = dict()
+    for k in edges.keys():
+        inDeg[k] = 0
+    inDeg[0] = 1
+    for k in edges.keys():
+        for v in edges[k]:
+            if v != "E":
+                inDeg[v] += 1
+    print(inDeg)
+    count = 1
+    for k in inDeg.keys():
+        count += inDeg[k] - 1
+
     print(count)
     #input()
 
