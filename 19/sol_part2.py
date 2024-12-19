@@ -76,7 +76,25 @@ def count_possible_arrangements(design, pattern_map):
                     edges[start+len(towel)] = set()
     print(edges)
     input()
-        
+    # Find an entry on the graph with no children
+    pruning = True
+    while pruning:
+        pruning = False
+        deadBranches = set()
+        for k in edges.keys():
+            if len(edges[k]) == 0:
+                deadBranches.add(k)
+                pruning = True
+        for branch in deadBranches:
+            edges.pop(branch)
+        if pruning:
+            for k in edges.keys():
+                for b in deadBranches:
+                    if b in edges[k]:
+                        edges[k].remove(b)
+    print(edges) 
+    input()
+
 
 def main():
     patterns, designs = extract_data()
