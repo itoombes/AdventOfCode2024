@@ -28,56 +28,40 @@ def preprocess_patterns(patterns):
         pattern_map[pattern[0]].append(pattern)
         for c in pattern:
             alphabet.add(c)
-    return alphabet, pattern_map
+    return pattern_map
 
-def check_possible(design, alphabet, pattern_map):
-    print(f"Evaluating {design}...")
-    input()
-    for c in design:
-        if c not in alphabet:
-            print(f"\tAlphabet mismatch.")
-            return False
-    candidates = list()
-    # Add the first candidates
-    if design[0] not in pattern_map.keys():
-        print(f"\tInvalid start!")
-        return False
-    for towel in pattern_map[design[0]]:
-        if design[0:len(towel)] == towel:
-            candidates.append(towel)
-    if len(candidates) == 0:
-        print(f"\tInvalid start!")
-    candidates.sort() # Want largest at the end
-    
-    while len(candidates) > 0:
-        print(f"\t{candidates}")
-        c = candidates.pop(-1) # DFS
-        # Check if no more patterns possbile
-        if design[len(c)] not in pattern_map:
+def check_possible(design, pattern_map):
+    pattern_starts = [0,]
+    visited = set()
+    while len(pattern_starts) > 0:
+        start = pattern_starts.pop(-1)
+        visited.add(start)
+        if design[start] not in pattern_map.keys():
             continue
-        # Evaluate next possible designs
-        nextCandidates = list()
-        for towel in pattern_map[design[len(c)]]:
-            nC = c + towel
-            nextCandidates.append(c + towel)
-            if nC != design[:len(nC)]:
+        for towel in pattern_map[design[start]]:
+            towelLen = len(towel)
+            # Ensure not over size
+            if start+len(towel) > len(design) + 1:
                 continue
-            if len(nC) > len(design):
+            # Ensure a match
+            if design[start:start+len(towel)] != towel:
                 continue
-            if nC == design:
-                print(f"\tMatch! {nC}")
+            # Check if found the end
+            if start+len(towel) == len(design):
                 return True
-            candidates.append(nC)
-    print(f"\tNo match.")
+            # Add the new start point
+            if start+len(towel) not in pattern_starts and start+len(towel) not in visited:
+                pattern_starts.append(start+len(towel))
+
     return False
 
 def main():
     patterns, designs = extract_data()
-    alphabet, pattern_map = preprocess_patterns(patterns)
-    print(alphabet, pattern_map)
+    pattern_map = preprocess_patterns(patterns)
+    print(pattern_map)
     count = 0
     for design in designs:
-        if check_possible(design, alphabet, pattern_map):
+        if check_possible(design, pattern_map):
             count += 1
     print(count)
 
