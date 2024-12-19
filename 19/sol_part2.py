@@ -3,7 +3,7 @@
 
 import copy
 
-DUMMY = 1
+DUMMY = 0
 
 if DUMMY:
     PATTERNS = "dummy1.txt"
@@ -110,7 +110,8 @@ def count_possible_arrangements(design, pattern_map):
     print(inDeg)
     count = 1
     for k in inDeg.keys():
-        count += inDeg[k] - 1
+        if inDeg[k] > 1:
+            count += inDeg[k]
 
     print(count)
     #input()
