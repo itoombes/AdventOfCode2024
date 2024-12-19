@@ -56,6 +56,7 @@ def check_possible(design, pattern_map):
 
 def count_possible_arrangements(design, pattern_map):
     print(f"Evaluating {design}")
+    # Generate a graph connecting every possible pattern
     pattern_starts = [0,]
     edges = {0: set()}
     while len(pattern_starts) > 0:
@@ -75,6 +76,36 @@ def count_possible_arrangements(design, pattern_map):
                     pattern_starts.append(start+len(towel))
                     edges[start+len(towel)] = set()
     print(edges)
+    # Prune the graph
+    badEnds = set()
+    pruning = True
+    while pruning:
+        keys = list()
+        for k in edges.keys():
+            keys.append(k)
+        pruning = False
+        i = 0
+        while i < len(edges.keys()):
+            k = keys[i]
+            j = 0
+            edgeGroup = list()
+            for edge in edges[k]:
+                edgeGroup.append(edge)
+            while j < (len(edges[k])):
+                if edgeGroup[j] in badEnds:
+                    edges[k].remove(edgeGroup[j])
+                    edgeGroup.remove(edgeGroup[j])
+                    j = 0
+                else: j += 1
+            if len(edges[k]) == 0:
+                edges.pop(k)
+                keys.remove(k)
+                badEnds.add(k)
+                pruning = True
+                i = 0
+            else: i += 1
+    print(edges)
+    
     input()
         
 
