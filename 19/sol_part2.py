@@ -1,6 +1,8 @@
 # itoombes, Advent of Code 2024
 # Day 19
 
+import copy
+
 DUMMY = 0
 
 if DUMMY:
@@ -57,56 +59,29 @@ def check_possible(design, pattern_map):
 def count_possible_arrangements(design, pattern_map):
     print(f"Evaluating {design}")
     # Generate a graph connecting every possible pattern
-    pattern_starts = [0,]
-    edges = {0: set()}
-    while len(pattern_starts) > 0:
-        start = pattern_starts.pop(0)
+    candidates = [[0,],]
+    count = 0
+    while len(candidates) > 0:
+        #print(candidates)
+        p = candidates.pop(0)
+        start = p[-1]
+        #print(start)
         if design[start] not in pattern_map.keys():
             continue
         for towel in pattern_map[design[start]]:
+            c = copy.deepcopy(p)
             if start+len(towel) > len(design) + 1:
                 continue
             if design[start:start+len(towel)] != towel:
                 continue
+            c.append(start+len(towel))
             if start+len(towel) == len(design):
-                edges[start].add("E")
+                print("Increment count")
+                count += 1
             else:
-                edges[start].add(start+len(towel))
-                if start+len(towel) not in edges.keys():
-                    pattern_starts.append(start+len(towel))
-                    edges[start+len(towel)] = set()
-    print(edges)
-    # Prune the graph
-    badEnds = set()
-    pruning = True
-    while pruning:
-        keys = list()
-        for k in edges.keys():
-            keys.append(k)
-        pruning = False
-        i = 0
-        while i < len(edges.keys()):
-            k = keys[i]
-            j = 0
-            edgeGroup = list()
-            for edge in edges[k]:
-                edgeGroup.append(edge)
-            while j < (len(edges[k])):
-                if edgeGroup[j] in badEnds:
-                    edges[k].remove(edgeGroup[j])
-                    edgeGroup.remove(edgeGroup[j])
-                    j = 0
-                else: j += 1
-            if len(edges[k]) == 0:
-                edges.pop(k)
-                keys.remove(k)
-                badEnds.add(k)
-                pruning = True
-                i = 0
-            else: i += 1
-    print(edges)
-    
-    input()
+                candidates.append(c)
+    #input()
+    return count
         
 
 def main():
