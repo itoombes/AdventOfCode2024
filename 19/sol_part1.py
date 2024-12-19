@@ -1,7 +1,7 @@
 # itoombes, Advent of Code 2024
 # Day 19
 
-DUMMY = 1
+DUMMY = 0
 
 if DUMMY:
     PATTERNS = "dummy1.txt"
@@ -32,6 +32,7 @@ def preprocess_patterns(patterns):
 
 def check_possible(design, alphabet, pattern_map):
     print(f"Evaluating {design}...")
+    input()
     for c in design:
         if c not in alphabet:
             print(f"\tAlphabet mismatch.")
@@ -42,10 +43,11 @@ def check_possible(design, alphabet, pattern_map):
         print(f"\tInvalid start!")
         return False
     for towel in pattern_map[design[0]]:
-        candidates.append(towel)
+        if design[0:len(towel)] == towel:
+            candidates.append(towel)
     if len(candidates) == 0:
         print(f"\tInvalid start!")
-    candidates.sort() # Want largest first
+    candidates.sort() # Want largest at the end
     
     while len(candidates) > 0:
         print(f"\t{candidates}")
@@ -58,18 +60,14 @@ def check_possible(design, alphabet, pattern_map):
         for towel in pattern_map[design[len(c)]]:
             nC = c + towel
             nextCandidates.append(c + towel)
-        while len(nextCandidates) > 0:
-            nC = min(nextCandidates)
-            nextCandidates.remove(nC)
-            # See if any of the next patterns short enough
+            if nC != design[:len(nC)]:
+                continue
             if len(nC) > len(design):
                 continue
-            # Ensure a valid match
-            if nC == design[:len(nC)]:
-                candidates.append(nC)
-                if nC == design:
-                    print(f"\tMatch! {nC}")
-                    return True
+            if nC == design:
+                print(f"\tMatch! {nC}")
+                return True
+            candidates.append(nC)
     print(f"\tNo match.")
     return False
 
