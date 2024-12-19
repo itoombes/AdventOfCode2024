@@ -20,42 +20,66 @@ def extract_data():
     return patterns, designs
 
 def preprocess_patterns(patterns):
+    alphabet = set()
     pattern_map = dict()
     for pattern in patterns:
         if pattern[0] not in pattern_map:
             pattern_map[pattern[0]] = list()
         pattern_map[pattern[0]].append(pattern)
-    return pattern_map
+        for c in pattern:
+            alphabet.add(c)
+    return alphabet, pattern_map
 
-def check_possible(design, pattern_map):
+def check_possible(design, alphabet, pattern_map):
+    print(f"Evaluating {design}...")
+    for c in design:
+        if c not in alphabet:
+            print(f"\tAlphabet mismatch.")
+            return False
     candidates = list()
     # Add the first candidates
     if design[0] not in pattern_map.keys():
-        print(f"No match! {design}")
+        print(f"\tInvalid start!")
         return False
     for towel in pattern_map[design[0]]:
         candidates.append(towel)
+    if len(candidates) == 0:
+        print(f"\tInvalid start!")
+    candidates.sort() # Want largest first
     
     while len(candidates) > 0:
-        currentCandidate = candidates.pop(0)
-        if len(currentCandidate) > len(design):
+        print(f"\t{candidates}")
+        c = candidates.pop(-1) # DFS
+        # Check if no more patterns possbile
+        if design[len(c)] not in pattern_map:
             continue
-        if currentCandidate == design:
-            print(f"Match! {design} : {currentCandidate}")
-            return True
-        if currentCandidate == design[0:len(currentCandidate)]:
-            if design[len(currentCandidate)] in pattern_map.keys():
-                for nextTowel in pattern_map[design[len(currentCandidate)]]:
-                    candidates.append(currentCandidate + nextTowel)
-    print(f"No match! {design}")
+        # Evaluate next possible designs
+        nextCandidates = list()
+        for towel in pattern_map[design[len(c)]]:
+            nC = c + towel
+            nextCandidates.append(c + towel)
+        while len(nextCandidates) > 0:
+            nC = min(nextCandidates)
+            nextCandidates.remove(nC)
+            # See if any of the next patterns short enough
+            if len(nC) > len(design):
+                continue
+            # Ensure a valid match
+            if nC == design[:len(nC)]:
+                candidates.append(nC)
+                if nC == design:
+                    print(f"\tMatch! {nC}")
+                    return True
+    print(f"\tNo match.")
     return False
 
 def main():
     patterns, designs = extract_data()
-    pattern_map = preprocess_patterns(patterns)
+    alphabet, pattern_map = preprocess_patterns(patterns)
+    print(alphabet, pattern_map)
     count = 0
     for design in designs:
-        if check_possible(design, pattern_map):
+        if check_possible(design, alphabet, pattern_map):
             count += 1
     print(count)
 
