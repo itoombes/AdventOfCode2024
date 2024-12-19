@@ -56,6 +56,14 @@ def check_possible(design, pattern_map):
 
     return False
 
+def count_paths(dag, vertex):
+    if vertex == "E":
+        return 1
+    count = 0
+    for v in dag[vertex]:
+        count += count_paths(dag, v)
+    return count
+
 def count_possible_arrangements(design, pattern_map):
     print(f"Evaluating {design}")
     pattern_starts = [0,]
@@ -96,22 +104,9 @@ def count_possible_arrangements(design, pattern_map):
                         edges[k].remove(b)
     print(edges) 
     #input()
-    # Now, count the possible paths
 
-    # Get the in-degree for each node
-    inDeg = dict()
-    for k in edges.keys():
-        inDeg[k] = 0
-    inDeg[0] = 1
-    for k in edges.keys():
-        for v in edges[k]:
-            if v != "E":
-                inDeg[v] += 1
-    print(inDeg)
-    count = 1
-    for k in inDeg.keys():
-        if inDeg[k] > 1:
-            count += inDeg[k]
+    # Determine the depth of each node
+    count = count_paths(edges, 0) 
 
     print(count)
     #input()
