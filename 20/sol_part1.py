@@ -12,7 +12,7 @@ else:
 class Track():
     def __init__(self):
         self._track, self._start, self._end = Track.parse_track()
-        print(self.get_times_to_end())
+        self._times_to_end = self.get_times_to_end()
 
     def parse_track():
         track = list()
@@ -49,8 +49,40 @@ class Track():
                 cCol = sC
                 break
 
+    def find_shortcuts(self):
+        shortcuts = dict()
+        # For every position on the actual track
+        for startNode in self._times_to_end.keys():
+            startTime = self._times_to_end[startNode]
+            startR, startC = startNode
+            # Determine available shortcuts 
+            successors = list()
+            if self._track[startR + 1][startC] == "#":
+                successors.append((startR + 2, startC))
+            if self._track[startR - 1][startC] == "#":
+                successors.append((startR - 2, startC))
+            if self._track[startR][startC + 1] == "#":
+                successors.append((startR, startC + 2))
+            if self._track[startR][startC - 1] == "#":
+                successors.append((startR, startC - 2))
+            # Process potential shortcuts
+            for s in successors:
+                # Make sure part of the track
+                if s not in self._times_to_end:
+                    continue
+                # Process shortcut
+                timeSaved = self._times_to_end[s] - startTime - 2
+                if timeSaved > 0:
+                    if timeSaved not in shortcuts:
+                        shortcuts[timeSaved] = 1
+                    else:
+                        shortcuts[timeSaved] += 1
+
+        print(shortcuts)
+
 def main():
     track = Track()
+    track.find_shortcuts()
 
 if __name__ == "__main__":
     main()
