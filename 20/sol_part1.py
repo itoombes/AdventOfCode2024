@@ -3,7 +3,7 @@
 
 import copy
 
-DUMMY = 1
+DUMMY = 0
 if DUMMY:
     INPUT = "dummy.txt"
 else:
@@ -78,11 +78,12 @@ class Track():
                     else:
                         shortcuts[timeSaved] += 1
 
-        print(shortcuts)
+        return shortcuts
 
 def main():
     track = Track()
-    track.find_shortcuts()
+    shortcuts = track.find_shortcuts()
+    print(shortcuts[100])
 
 if __name__ == "__main__":
     main()
