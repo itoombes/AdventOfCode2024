@@ -3,7 +3,7 @@
 
 import copy
 
-DUMMY = 1
+DUMMY = 0
 if DUMMY:
     INPUT = "dummy.txt"
 else:
@@ -54,24 +54,16 @@ class Track():
         # For every position on the actual track
         for startNode in self._times_to_end.keys():
             startTime = self._times_to_end[startNode]
-            startR, startC = startNode
-            # Determine available shortcuts 
-            successors = list()
-            if self._track[startR + 1][startC] == "#":
-                successors.append((startR + 2, startC))
-            if self._track[startR - 1][startC] == "#":
-                successors.append((startR - 2, startC))
-            if self._track[startR][startC + 1] == "#":
-                successors.append((startR, startC + 2))
-            if self._track[startR][startC - 1] == "#":
-                successors.append((startR, startC - 2))
-            # Process potential shortcuts
-            for s in successors:
-                # Make sure part of the track
-                if s not in self._times_to_end:
-                    continue
-                # Process shortcut
-                timeSaved = self._times_to_end[s] - startTime - 2
+            for endNode in self._times_to_end.keys():
+                if startNode == endNode: continue
+                # Ensure node in range
+                dx = startNode[0] - endNode[0]
+                if dx < 0: dx *= -1
+                dy = startNode[1] - endNode[1]
+                if dy < 0: dy *= -1
+                if dx + dy > 20: continue
+                # Handle the shortcut, including the travel time
+                timeSaved = self._times_to_end[endNode] - startTime - dx - dy
                 if timeSaved > 0:
                     if timeSaved not in shortcuts:
                         shortcuts[timeSaved] = 1
@@ -87,6 +79,7 @@ def main():
     for time in shortcuts.keys():
         if time >= 100:
             cheats += shortcuts[time]
+    print(shortcuts)
     print(cheats)
 
 if __name__ == "__main__":
