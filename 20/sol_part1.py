@@ -12,7 +12,7 @@ else:
 class Track():
     def __init__(self):
         self._track, self._start, self._end = Track.parse_track()
-        print(self.return_shortest_path())
+        print(self.get_times_to_end())
 
     def parse_track():
         track = list()
@@ -28,27 +28,26 @@ class Track():
                         end = (r, c)
         return (track, start, end)
 
-    def return_shortest_path(self):
-        frontier = [(set(), self._start),]
+    def get_times_to_end(self):
+        times = {self._start : 0}
         visited = set()
         visited.add(self._start)
-        while len(frontier) > 0:
-            path, node = frontier.pop(0)
-            r, c = node
-            if self._track[r][c] == "E":
-                return path
-            for sR, sC in ((r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)):
-                nPath = copy.deepcopy(path)
-                nPath.add((sR, sC))
-                # Avoid collisions
-                if self._track[sR][sC] == "#":
+        cost = 0
+        cRow, cCol = self._start
+        while True:
+            times[(cRow, cCol)] = cost
+            cost += 1
+            # Have reached the end of the track
+            if self._track[cRow][cCol] == "E":
+                return times
+            # Continue along track
+            for sR, sC in ((cRow + 1, cCol), (cRow - 1, cCol), (cRow, cCol + 1), (cRow, cCol - 1)):
+                if self._track[sR][sC] == "#" or (sR, sC) in visited:
                     continue
-                # Add successors to next
-                if (sR, sC) not in visited:
-                    visited.add((sR, sC))
-                    frontier.append((nPath, (sR, sC)))
-        return None
-
+                visited.add((sR, sC))
+                cRow = sR
+                cCol = sC
+                break
 
 def main():
     track = Track()
