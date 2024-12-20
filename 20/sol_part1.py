@@ -83,7 +83,11 @@ class Track():
 def main():
     track = Track()
     shortcuts = track.find_shortcuts()
-    print(shortcuts[100])
+    cheats = 0
+    for time in shortcuts.keys():
+        if time >= 100:
+            cheats += shortcuts[time]
+    print(cheats)
 
 if __name__ == "__main__":
     main()
