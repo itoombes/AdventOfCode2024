@@ -11,7 +11,7 @@ KEYPAD = [["7", "8", "9"],
           [None, "0", "A"]]
 
 
-DUMMY = 1
+DUMMY = 0
 if DUMMY:
     INPUT = "dummy.txt"
 else:
@@ -48,6 +48,11 @@ class BotChain():
         for col in ((self._bot1_c, self._bot2_c, self._bot3_c)):
             if col < 0 or col > 2:
                 return True
+        # Check if in the blank spot
+        if self._bot2_c == self._bot2_r == 0 or self._bot1_c == self._bot1_r == 0:
+            return True
+        if self._bot3_c == 0 and self._bot3_r == 3:
+            return True
         return False
 
     def get_successors(self):
@@ -125,6 +130,8 @@ def solve_bfs(sequence):
 
     while len(frontier) > 0:
         cost, chain = frontier.pop(0)
+        #print(cost)
+        #print(chain)
         cost += 1
         # Note that validity checked within each node
         for s in chain.get_successors():
@@ -152,6 +159,7 @@ def main():
         number = extract_number(sequence) 
         print(f"{sequence}: {minMoves} * {number}")
         count += minMoves * number
+        input()
     print(count)
 
 
