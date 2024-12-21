@@ -54,8 +54,8 @@ class MultiArmedBotbit:
         # Update all arms but the last
         for i in range(0 , len(arms) - 1):
             # Handle motion - note that this terminates the update process
+            nR, nC = self._arms[i]
             if action != "A":
-                nR, nC = self._arms[i]
                 if action == "^":
                     if nR == 0 or nC == 0: # Skip moving when up or to (0, 0)
                         return successors
@@ -80,6 +80,32 @@ class MultiArmedBotbit:
                 self._arms[i] = (nR, nC)
                 successors.append(self)
                 return successors
+            # Update the next arm
+            action = ROBOT_PAD[nR][nC]
+            i += 1
+        # Update the last arm
+        if action == "A": # DON'T WANT TO MODIFY THE OUTPUT!
+            return successors
+        nR, nC = self._arms[-1]
+        if action == "^":
+            if nR == 0:
+                return successors
+            nR -= 1
+        if action == "<":
+            if nC == 0 or (nC == 1 and nR == 3):
+                return successors
+            nC -= 1
+        if action == ">":
+            if nC == 2:
+                return successors
+            nC += 1
+        if action == "v":
+            if nR == 3 or (nR == 2 and nC == 0):
+                return successors
+            nR -= 1
+        self._arms[-1] = (nR, nC)
+        successors.append(self)
+        return successors
 
 
 
@@ -92,10 +118,6 @@ class MultiArmedBotbit:
         
     def __eq__(self, other):
         return str(self) == str(other)
-
-    def update_from_start(self):
-        pass
-
 
 def main():
     MultiArmedBotbit((0, 2), [(0, 2),] * 24)
