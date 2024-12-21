@@ -58,6 +58,8 @@ class BotChain():
         r = self._bot1_r
         c = self._bot1_c
         for row, col in ((r - 1, c), (r + 1, c), (r, c - 1), (r, c + 1)):
+            if row == 0 and col == 0:
+                continue
             if row < 0 or row > 1:
                 continue
             if col < 0 or col > 2:
@@ -108,19 +110,42 @@ class BotChain():
     def get_state(self):
         return (self._bot1_r, self._bot1_c, self._bot2_r, self._bot2_c, self._bot3_r, self._bot3_c, str(self._output))
 
+    def get_output(self):
+        return self._output
+
     def __eq__(self, other):
         return self.get_state() == other.get_state()
 
-def main():
-    print(read_sequences())
-    control = BotChain(0, 2, 0, 2, 3, 2, list())
-    dupe = BotChain(1, 2, 0, 2, 3, 2, list())
-    other = BotChain(0, 2, 0, 2, 3, 2, ["A",])
+def solve_bfs(sequence):
+    # Setup init node
+    start = BotChain(0, 2, 0, 2, 3, 2, list())
+    frontier = [(0, start),]
+    visited = set()
+    visited.add(start.get_state())
 
-    print(control)
-    print(control.get_state())
-    print(control == dupe)
-    print(control == other)
+    while len(frontier) > 0:
+        cost, chain = frontier.pop(0)
+        print(chain)
+        cost += 1
+        # Note that validity checked within each node
+        for s in chain.get_successors():
+            if s.get_state() in visited:
+                continue
+            visited.add(s.get_state())
+            output = s.get_output()
+            # Detect end
+            if output == sequence:
+                return cost
+            # Ensure pattern is valid
+            if output == sequence[:len(output)]:
+                frontier.append((cost, s))
+        
+
+def main():
+    for sequence in read_sequences():
+        print(sequence)
+        minMoves = solve_bfs(sequence)
+        print(minMoves)
 
 if __name__ == "__main__":
     main()
