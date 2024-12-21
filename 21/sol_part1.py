@@ -105,14 +105,22 @@ class BotChain():
         string += f"Output : {self._output}\n"
         return string
 
+    def get_state(self):
+        return (self._bot1_r, self._bot1_c, self._bot2_r, self._bot2_c, self._bot3_r, self._bot3_c, str(self._output))
+
+    def __eq__(self, other):
+        return self.get_state() == other.get_state()
+
 def main():
     print(read_sequences())
     control = BotChain(0, 2, 0, 2, 3, 2, list())
+    dupe = BotChain(1, 2, 0, 2, 3, 2, list())
+    other = BotChain(0, 2, 0, 2, 3, 2, ["A",])
+
     print(control)
-    for c in control.get_successors():
-        print("----------------")
-        print(c)
-        print("----------------")
+    print(control.get_state())
+    print(control == dupe)
+    print(control == other)
 
 if __name__ == "__main__":
     main()
