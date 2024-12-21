@@ -11,7 +11,7 @@ KEYPAD = [["7", "8", "9"],
           [None, "0", "A"]]
 
 
-DUMMY = 0
+DUMMY = 1
 if DUMMY:
     INPUT = "dummy.txt"
 else:
@@ -125,7 +125,6 @@ def solve_bfs(sequence):
 
     while len(frontier) > 0:
         cost, chain = frontier.pop(0)
-        print(chain)
         cost += 1
         # Note that validity checked within each node
         for s in chain.get_successors():
@@ -140,12 +139,21 @@ def solve_bfs(sequence):
             if output == sequence[:len(output)]:
                 frontier.append((cost, s))
         
+def extract_number(sequence):
+    string = ""
+    for c in sequence[:3]:
+        string += c
+    return int(string)
 
 def main():
+    count = 0
     for sequence in read_sequences():
-        print(sequence)
         minMoves = solve_bfs(sequence)
-        print(minMoves)
+        number = extract_number(sequence) 
+        print(f"{sequence}: {minMoves} * {number}")
+        count += minMoves * number
+    print(count)
+
 
 if __name__ == "__main__":
     main()
