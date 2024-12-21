@@ -1,6 +1,8 @@
 # itoombes, Advent of Code 2024
 # Day 21
 
+import copy
+
 ROBOT_PAD = [[None, "^", "A"],
              ["<", "v", ">"]]
 KEYPAD = [["7", "8", "9"],
@@ -52,7 +54,7 @@ class BotChain():
         
         # Go thru each potential action sequence
         successors = list()
-        # Apply motion
+        # Directional button press 
         r = self._bot1_r
         c = self._bot1_c
         for row, col in ((r - 1, c), (r + 1, c), (r, c - 1), (r, c + 1)):
@@ -60,10 +62,41 @@ class BotChain():
                 continue
             if col < 0 or col > 2:
                 continue
-            successors.append(BotChain(row, col, self._bot2_r, self._bot2_c, self._bot3_r, self._bot3_c, self._output))
-        return successors
-        # Apply button
+            successors.append(BotChain(row, col, self._bot2_r, self._bot2_c, self._bot3_r, self._bot3_c, copy.copy(self._output)))
+        # Action button press
+        # Note that it modifies THIS OBJECT
         bot2_response = ROBOT_PAD[self._bot1_r][self._bot1_c]
+        # Bot 2 directional response
+        if bot2_response == "^":
+            self._bot2_r -= 1
+        elif bot2_response == "v":
+            self._bot2_r += 1
+        elif bot2_response == "<":
+            self._bot2_c -= 1
+        elif bot2_response == ">":
+            self._bot2_c += 1
+        if self.check_panic(): # Ensure bot 2 is pointing at valid location
+            return successors
+        # Bot 2 action response
+        if bot2_response == "A":
+            # Bot 3 directional response
+            bot3_response = ROBOT_PAD[self._bot2_r][self._bot2_c]
+            if bot3_response == "^":
+                self._bot3_r -= 1
+            elif bot3_response == "v":
+                self._bot3_r += 1
+            elif bot3_response == "<":
+                self._bot3_c -= 1
+            elif bot3_response == ">":
+                self._bot3_c += 1
+            if self.check_panic():
+                return successors
+            # Bot 3 action response
+            if bot3_response == "A":
+                self._output.append(KEYPAD[self._bot3_r][self._bot3_c])
+        successors.append(self) 
+        return successors
+
 
     def __str__(self):
         string = f"Bot 1 : ({self._bot1_r}, {self._bot1_c}) -> {ROBOT_PAD[self._bot1_r][self._bot1_c]}\n"
