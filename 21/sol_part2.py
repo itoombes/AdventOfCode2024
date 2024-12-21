@@ -1,24 +1,80 @@
-# itoombes, Advent of Code 2024
-# Day 21
+# itoombes, Advent of Code
+# Day 21 Part 2
 
 import copy
 
-ROBOT_PAD = [[None, "^", "A"],
-             ["<", "v", ">"]]
-KEYPAD = [["7", "8", "9"],
-          ["4", "5", "6"],
-          ["1", "2", "3"],
-          [None, "0", "A"]]
+ROBOT_PAD = ((None, "^", "A"),
+             ("<", "v", ">"))
+KEYPAD = (("7", "8", "9"),
+          ("4", "5", "6"),
+          ("1", "2", "3"),
+          (None, "0", "A"))
 
+class MultiArmedBotbit:
+    def __init__(self, arms, lastArm):
+        self._arms = arms # Pointers to each pad controlled by robot arm; 25 items
+        self._lastArm = lastArm
+    def move_up(self, i = 0):
+        r, c = self._arms[i]
+        if r == 0 or ROBOT_PAD[r - 1][c] is None:
+            return None
+        return MultiArmedBotbit(self._arms[:i] + [(r - 1, c),] + self._arms[i + 1:], self._lastArm)
 
-DUMMY = 0
-if DUMMY:
-    INPUT = "dummy.txt"
-else:
-    INPUT = "input.txt"
+    def move_down(self, i = 0):
+        r, c = self._arms[i]
+        if r == 1 or ROBOT_PAD[r + 1][c] is None:
+            return None
+        return MultiArmedBotbit(self._arms[:i] + [(r + 1, c),] + self._arms[i + 1:], self._lastArm)
+
+    def move_left(self, i = 0):
+        r, c = self._arms[i]
+        if c == 0 or ROBOT_PAD[r][c - 1] is None:
+            return None
+        return MultiArmedBotbit(self._arms[:i] + [(r, c - 1),] + self._arms[i + 1:], self._lastArm)
+
+    def move_right(self, i = 0):
+        r, c = self._arms[i]
+        if c == 2 or ROBOT_PAD[r][c + 1] is None:
+            return None
+        return MultiArmedBotbit(self._arms[:i] + [(r, c + 1),] + self._arms[i + 1:], self._lastArm)
+
+    def handle_last_action(action):
+        r, c = self._lastArm
+        if action == "^":
+            r -= 1
+        elif action == "v":
+            r += 1
+        elif action == ">":
+            c += 1
+        elif action == "<":
+            c -= 1
+        if c < 0 or r < 0 or c > 2 or c > 3 or KEYPAD[r][c] == None:
+            return None
+        return MultiArmedBotbit(copy.copy(self._arms), (r, c))
+
+    def action(self, i = 0):
+        r, c = self._arms[i]
+        action = self._arms[r][c]
+        
+        # Handle last arm
+        if i == len(self._arms) - 1:
+            if action == "A": # DON'T HANDLE OUTPUT HERE
+                return None
+            return self.handle_last_arm(action)
+
+        if action == "A":
+            return self.action(i + 1)
+        elif action == "^":
+            return self.move_up(i + 1)
+        elif action == "v":
+            return self.move_down(i + 1)
+        elif action == "<":
+            return self.move_left(i + 1)
+        elif action == ">":
+            return self.move_right(i + 1)
 
 def read_sequences():
-    f = open(INPUT, "r")
+    f = open("input.txt", "r")
     sequences = list()
     for line in f.readlines():
         sequence = list()
@@ -33,95 +89,8 @@ def extract_number(sequence):
         string += c
     return int(string)
 
-class MultiArmedBotbit:
-    def __init__(self, firstArm, midArms)
-        self._firstArm = firstArm
-        self._arms = midArms
-
-    def get_successors(self):
-        successors = list()
-        r, c = self._firstArm
-        # If motion in the first arm is applied
-        for nR, nC in ((r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)):
-            # Ensure not (0,0)
-            if nR == nC == 0:
-                continue
-            # Ensure in range
-            if nR >= 0 and nR < 2 and nC >= 0 and nC < 3:
-                successors.append(MultiArmedBotbit((nR, nC), copy.copy(self._arms), self._lastArm))
-        # Action takes place - note this modifies self!
-        action = ROBOT_PAD[r][c]
-        # Update all arms but the last
-        for i in range(0 , len(arms) - 1):
-            # Handle motion - note that this terminates the update process
-            nR, nC = self._arms[i]
-            if action != "A":
-                if action == "^":
-                    if nR == 0 or nC == 0: # Skip moving when up or to (0, 0)
-                        return successors
-                    else:
-                        nR -= 1
-                elif action == "<":
-                    if (nR == 1 and nC == 1) or nC == 0:
-                        return successors
-                    else:
-                        nC -= 1
-                elif action == ">":
-                    if nC == 2:
-                        return successors
-                    else:
-                        nC += 1
-                elif action == "v":
-                    if nR == 1:
-                        return successors
-                    else:
-                        nR += 1
-                # Don't process any more arms
-                self._arms[i] = (nR, nC)
-                successors.append(self)
-                return successors
-            # Update the next arm
-            action = ROBOT_PAD[nR][nC]
-            i += 1
-        # Update the last arm
-        if action == "A": # DON'T WANT TO MODIFY THE OUTPUT!
-            return successors
-        nR, nC = self._arms[-1]
-        if action == "^":
-            if nR == 0:
-                return successors
-            nR -= 1
-        if action == "<":
-            if nC == 0 or (nC == 1 and nR == 3):
-                return successors
-            nC -= 1
-        if action == ">":
-            if nC == 2:
-                return successors
-            nC += 1
-        if action == "v":
-            if nR == 3 or (nR == 2 and nC == 0):
-                return successors
-            nR -= 1
-        self._arms[-1] = (nR, nC)
-        successors.append(self)
-        return successors
-
-
-
-
-    def get_last_arm(self):
-        return self._arms[-1]
-
-    def __str__(self):
-        return f"{self._firstArm}, {str(self._arms)}, {self._lastArm}\n"
-        
-    def __eq__(self, other):
-        return str(self) == str(other)
-
 def main():
-    MultiArmedBotbit((0, 2), [(0, 2),] * 24)
-    
+    botbit = MultiArmedBotbit
 
 if __name__ == "__main__":
     main()
