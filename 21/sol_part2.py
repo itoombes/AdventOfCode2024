@@ -42,7 +42,7 @@ def extract_number(sequence):
         string += c
     return int(string)
 
-def cost_between_arm_positions(transition_costs, init_state, target_state, valid_states):
+def min_cost(transition_costs, init_state, target_state, valid_states):
     # (<state>, <upper arm action>)
     frontier = [(0, (init_state, "A")),]
     heapq.heapify(frontier)
@@ -50,7 +50,7 @@ def cost_between_arm_positions(transition_costs, init_state, target_state, valid
     while len(frontier) > 0:
         cost, node = heapq.heappop(frontier)
         arm, control = node
-        print(f"{cost} : {arm}, {control}")
+        #print(f"{cost} : {arm}, {control}")
         # Check if state is goal
         if control == "A" and arm == target_state:
             return visited[(arm, "A")]
@@ -102,9 +102,54 @@ def process_transition_costs(depth):
                         "v" : {"<" : 0, ">" : 0, "A" : 0},
                         "<" : {"^" : 0, "v" : 0, "A" : 0},
                         ">" : {"^" : 0, "v" : 0, "A" : 0}}
-    print(cost_between_arm_positions(transition_costs, (2, 1), (0, 0), ROBOT_PAD))
-
     i = 1
+    # Generate transition costs
+    while i <= depth:
+        AtU = min_cost(transition_costs, (2, 1), (1, 1), ROBOT_PAD)
+        AtL = min_cost(transition_costs, (2, 1), (0, 0), ROBOT_PAD)
+        AtR = min_cost(transition_costs, (2, 1), (2, 0), ROBOT_PAD)
+        AtD = min_cost(transition_costs, (2, 1), (1, 0), ROBOT_PAD)
+
+        UtL = min_cost(transition_costs, (1, 1), (0, 0), ROBOT_PAD)
+        UtR = min_cost(transition_costs, (1, 1), (2, 0), ROBOT_PAD)
+        UtA = min_cost(transition_costs, (1, 1), (2, 1), ROBOT_PAD)
+        
+        DtL = min_cost(transition_costs, (1, 0), (0, 0), ROBOT_PAD)
+        DtR = min_cost(transition_costs, (1, 0), (2, 0), ROBOT_PAD)
+        DtA = min_cost(transition_costs, (1, 0), (2, 1), ROBOT_PAD)
+
+        LtU = min_cost(transition_costs, (0, 0), (1, 1), ROBOT_PAD)
+        LtD = min_cost(transition_costs, (0, 0), (1, 0), ROBOT_PAD)
+        LtA = min_cost(transition_costs, (0, 0), (2, 1), ROBOT_PAD)
+        
+        RtU = min_cost(transition_costs, (2, 0), (1, 1), ROBOT_PAD)
+        RtD = min_cost(transition_costs, (2, 0), (1, 0), ROBOT_PAD)
+        RtA = min_cost(transition_costs, (2, 0), (2, 1), ROBOT_PAD)
+
+        transition_costs["A"]["^"] = AtU
+        transition_costs["A"]["<"] = AtL
+        transition_costs["A"][">"] = AtR
+        transition_costs["A"]["v"] = AtD
+
+        transition_costs["^"]["<"] = UtL
+        transition_costs["^"][">"] = UtR
+        transition_costs["^"]["A"] = UtA
+
+        transition_costs["v"]["<"] = DtL
+        transition_costs["v"][">"] = DtR
+        transition_costs["v"]["A"] = DtA
+
+        transition_costs["<"]["^"] = LtU
+        transition_costs["<"]["v"] = LtD
+        transition_costs["<"]["A"] = LtA
+
+        transition_costs[">"]["^"] = RtU
+        transition_costs[">"]["v"] = RtD
+        transition_costs[">"]["A"] = RtA
+
+        i += 1
+
+    return transition_costs
 
 
 def main():
