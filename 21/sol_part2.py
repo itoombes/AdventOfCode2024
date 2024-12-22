@@ -2,125 +2,28 @@
 # Day 21 Part 2
 
 import copy
-
-ROBOT_PAD = ((None, "^", "A"),
-             ("<", "v", ">"))
-KEYPAD = (("7", "8", "9"),
-          ("4", "5", "6"),
-          ("1", "2", "3"),
-          (None, "0", "A"))
-
-class MultiArmedBotbit:
-    def __init__(self, arms, lastArm):
-        self._arms = arms # Pointers to each pad controlled by robot arm; 25 items
-        self._lastArm = lastArm
-
-    def move_up(self, i = 0):
-        r, c = self._arms[i]
-        if r == 0 or ROBOT_PAD[r - 1][c] is None:
-            return None
-        return MultiArmedBotbit(self._arms[:i] + [(r - 1, c),] + self._arms[i + 1:], self._lastArm)
-
-    def move_down(self, i = 0):
-        r, c = self._arms[i]
-        if r == 1 or ROBOT_PAD[r + 1][c] is None:
-            return None
-        return MultiArmedBotbit(self._arms[:i] + [(r + 1, c),] + self._arms[i + 1:], self._lastArm)
-
-    def move_left(self, i = 0):
-        r, c = self._arms[i]
-        if c == 0 or ROBOT_PAD[r][c - 1] is None:
-            return None
-        return MultiArmedBotbit(self._arms[:i] + [(r, c - 1),] + self._arms[i + 1:], self._lastArm)
-
-    def move_right(self, i = 0):
-        r, c = self._arms[i]
-        if c == 2 or ROBOT_PAD[r][c + 1] is None:
-            return None
-        return MultiArmedBotbit(self._arms[:i] + [(r, c + 1),] + self._arms[i + 1:], self._lastArm)
-
-    def handle_last_action(action):
-        r, c = self._lastArm
-        if action == "^":
-            r -= 1
-        elif action == "v":
-            r += 1
-        elif action == ">":
-            c += 1
-        elif action == "<":
-            c -= 1
-        if c < 0 or r < 0 or c > 2 or c > 3 or KEYPAD[r][c] == None:
-            return None
-        return MultiArmedBotbit(copy.copy(self._arms), (r, c))
-
-    def action(self, i = 0):
-        r, c = self._arms[i]
-        action = ROBOT_PAD[r][c]
-        
-        # Handle last arm
-        if i == len(self._arms) - 1:
-            if action == "A": # DON'T HANDLE OUTPUT HERE
-                return None
-            return self.handle_last_arm(action)
-
-        if action == "A":
-            return self.action(i + 1)
-        elif action == "^":
-            return self.move_up(i + 1)
-        elif action == "v":
-            return self.move_down(i + 1)
-        elif action == "<":
-            return self.move_left(i + 1)
-        elif action == ">":
-            return self.move_right(i + 1)
-
-    def get_successors(self):
-        candidates = (self.move_up(), self.move_down(), self.move_right(), self.move_left(), self.action())
-        successors = list()
-        for c in candidates:
-            if c is not None:
-                successors.append(c)
-        return successors
-
-    def get_arms(self):
-        return self._arms
-
-    def get_state(self):
-        return f"{self._arms}; {self._lastArm}"
-
-    def __str__(self):
-        return self.get_state()
-
-    def get_last_arm(self):
-        return self._lastArm
-
-    def __eq__(self, other):
-        return self.get_state() == other.get_state()
-
-def moves_to_state(init, target):
-    # Returns number of moves where last arm is at target, all others on "A"
-    frontier = [(0, init),]
-    visited = set()
-    visited.add(init.get_state())
-    while len(frontier) > 0:
-        cost, chain = frontier.pop(0)
-        cost += 1
-        for s in chain.get_successors():
-            print(s)
-            if s.get_state() in visited:
-                continue
-            visited.add(s.get_state())
-            # Check if end
-            if chain.get_last_arm() == target:
-                match = True
-                for arm in chain.get_arms():
-                    if arm != (0, 2):
-                        match = False
-                        break
-                if match:
-                    return cost
-            # Add to frontier
-            frontier.append((cost, chain))
+#   ^ A
+# < v >
+ROBOT_PAD = {(0, 0) : "<",
+             (1, 0) : "v",
+             (2, 0) : ">",
+             (1, 1) : "^",
+             (2, 1) : "A"}
+# 7 8 9
+# 4 5 6
+# 1 2 3
+#   0 A
+KEYPAD = {(1, 0) : "0",
+          (2, 0) : "A",
+          (0, 1) : "1",
+          (1, 1) : "2",
+          (2, 1) : "3",
+          (0, 2) : "4",
+          (1, 2) : "5",
+          (2, 2) : "6",
+          (0, 3) : "7",
+          (1, 3) : "8",
+          (2, 3) : "9"}
 
 def read_sequences():
     f = open("input.txt", "r")
@@ -138,10 +41,72 @@ def extract_number(sequence):
         string += c
     return int(string)
 
-def main():
-    chain = MultiArmedBotbit([(0, 2),] * 25, (0,2))
-    print(moves_to_state(chain, (0, 1)))
+class RobotChain:
+    def __init__(self, arms):
+        self._arms = arms
 
+    def move_up(self, i = 0):
+        print(i)
+        x, y = self._arms[i]
+        if (x, y + 1) in ROBOT_PAD.keys():
+            return RobotChain(self._arms[:i] + [(x, y + 1),] + self._arms[i + 1:])
+        return None
+
+    def move_left(self, i = 0):
+        print(i)
+        x, y = self._arms[i]
+        if (x - 1, y) in ROBOT_PAD.keys():
+            return RobotChain(self._arms[:i] + [(x - 1, y),] + self._arms[i + 1:])
+        return None
+
+    def move_down(self, i = 0):
+        print(i)
+        x, y = self._arms[i]
+        if (x, y - 1) in ROBOT_PAD.keys():
+            return RobotChain(self._arms[:i] + [(x, y - 1),] + self._arms[i + 1:])
+        return None
+
+    def move_right(self, i = 0):
+        print(i)
+        x, y = self._arms[i]
+        if (x + 1, y) in ROBOT_PAD.keys():
+            return RobotChain(self._arms[:i] + [(x + 1, y),] + self._arms[i + 1:])
+        return None
+
+    def action(self, i = 0):
+        # Don't want to apply last arm's action
+        if i == len(self._arms) - 1:
+            print("Applying action of last arm")
+            return None
+        action = ROBOT_PAD[self._arms[i]]
+        print(action)
+        if action == "A": return self.action(i + 1)
+        elif action == "^": return self.move_up(i + 1)
+        elif action == "<": return self.move_left(i + 1)
+        elif action == "v": return self.move_down(i + 1)
+        elif action == ">": return self.move_right(i + 1)
+    
+    def __str__(self):
+        return str(self._arms)
+
+def preprocess():
+    pass
+
+
+def main():
+    chain = RobotChain([(2, 1),] * 26)
+    while True:
+        print(chain)
+        x = input()
+        if x == ",": nchain = chain.move_up()
+        elif x == "a": nchain = chain.move_left()
+        elif x == "o": nchain = chain.move_down()
+        elif x == "e": nchain = chain.move_right()
+        elif x == ".": nchain = chain.action()
+        if nchain is not None:
+            chain = nchain
+        else:
+            print("Illegal move")
 
 if __name__ == "__main__":
     main()
