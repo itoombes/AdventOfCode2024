@@ -122,8 +122,10 @@ def preprocess():
     pass
 
 def main():
-    chain = RobotChain([(2, 1), (0,0), (2,1)])
-    print(cost_between_states(chain, ((2, 1), (0, 0), (0, 0))))
+    chain = RobotChain([(2, 1),] * 10)
+    target = [(2, 1),] * 9 + [(0, 0),]
+    target = tuple(target)
+    print(cost_between_states(chain, target)) 
 
 if __name__ == "__main__":
     main()
