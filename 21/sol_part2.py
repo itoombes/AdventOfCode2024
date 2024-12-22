@@ -75,11 +75,10 @@ class RobotChain:
 
     def action(self, i = 0):
         # Don't want to apply last arm's action
-        if i == len(self._arms) - 1:
-            print("Applying action of last arm")
+        if i == len(self._arms):
+            print("LAST ARM ACTION!")
             return None
         action = ROBOT_PAD[self._arms[i]]
-        print(action)
         if action == "A": return self.action(i + 1)
         elif action == "^": return self.move_up(i + 1)
         elif action == "<": return self.move_left(i + 1)
@@ -92,9 +91,8 @@ class RobotChain:
 def preprocess():
     pass
 
-
 def main():
-    chain = RobotChain([(2, 1),] * 26)
+    chain = RobotChain([(2, 1), (0,0), (2,1)])
     while True:
         print(chain)
         x = input()
