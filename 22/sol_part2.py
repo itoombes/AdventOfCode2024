@@ -4,7 +4,7 @@
 PRUNE = 16777216
 N_SECRETS = 10
 
-DUMMY = 1
+DUMMY = 0
 if DUMMY:
     INPUT = "test.txt"
 else:
@@ -33,14 +33,27 @@ def extract_sequence(value):
         deltas.append(sequence[i] - sequence[i - 1])
     return sequence, deltas
 
+def extract_patterns(number):
+    sequence, deltas = extract_sequence(number)
+    pattern = deltas[1:5]
+    value = sequence[4]
+    pattern_map = {tuple(pattern) : value}
+    for i in range(5, len(deltas)):
+        # Get the next item in sequence
+        pattern.pop(0)
+        pattern.append(deltas[i])
+        # Detect loop - exit early
+        if tuple(pattern) in pattern_map.keys():
+            return pattern_map
+        pattern_map[tuple(pattern)] = sequence[i]
+    return pattern_map
+
 def main():
     result = 0
     numbers = get_initial_numbers()
     numbers = [123,]
     for number in numbers:
-        sequence, deltas = extract_sequence(number)
-        print(sequence)
-        print(deltas)
+        print(extract_patterns(number))
     print(result)
 
 if __name__ == "__main__":
