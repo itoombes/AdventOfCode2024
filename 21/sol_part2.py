@@ -101,7 +101,7 @@ def min_cost(transition_costs, init_state, target_state, valid_states):
 def process_transition_costs(depth):
     # Get the number of actions required to get to a "<action>, <action>, <BUTTON>" state
     # Start with depth 0 -- user controlled, no cost to change button
-    transition_costs = {"A": {"^" : 0, "<" : 0, ">" : 0, "v" : 0},
+    transition_costs = {"A" : {"^" : 0, "<" : 0, ">" : 0, "v" : 0},
                         "^" : {"<" : 0, ">" : 0, "A" : 0},
                         "v" : {"<" : 0, ">" : 0, "A" : 0},
                         "<" : {"^" : 0, "v" : 0, "A" : 0},
@@ -167,7 +167,7 @@ def solve_sequence(sequence, transition_costs):
 
 
 def main():
-    transition_costs = process_transition_costs(1)
+    transition_costs = process_transition_costs(25)
     complexity = 0
     for sequence in read_sequences():
         cost = solve_sequence(sequence, transition_costs)
