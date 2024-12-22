@@ -46,28 +46,24 @@ class RobotChain:
         self._arms = arms
 
     def move_up(self, i = 0):
-        print(i)
         x, y = self._arms[i]
         if (x, y + 1) in ROBOT_PAD.keys():
             return RobotChain(self._arms[:i] + [(x, y + 1),] + self._arms[i + 1:])
         return None
 
     def move_left(self, i = 0):
-        print(i)
         x, y = self._arms[i]
         if (x - 1, y) in ROBOT_PAD.keys():
             return RobotChain(self._arms[:i] + [(x - 1, y),] + self._arms[i + 1:])
         return None
 
     def move_down(self, i = 0):
-        print(i)
         x, y = self._arms[i]
         if (x, y - 1) in ROBOT_PAD.keys():
             return RobotChain(self._arms[:i] + [(x, y - 1),] + self._arms[i + 1:])
         return None
 
     def move_right(self, i = 0):
-        print(i)
         x, y = self._arms[i]
         if (x + 1, y) in ROBOT_PAD.keys():
             return RobotChain(self._arms[:i] + [(x + 1, y),] + self._arms[i + 1:])
@@ -88,11 +84,38 @@ class RobotChain:
     def __str__(self):
         return str(self._arms)
 
+    def get_state(self):
+        return tuple(self._arms)
+
+    def __eq__(self, other):
+        return self.get_state() == other.get_state()
+
+    def get_successors(self):
+        candidates = (self.move_up(), self.move_down(), self.move_right(), self.move_left(), self.action())
+        successors = list()
+        for c in candidates:
+            if c is not None:
+                successors.append(c)
+        return successors
+
+def cost_between_states(chain, state):
+    frontier = [(0, chain),]
+    visited = set()
+    visited.add(chain.get_state())
+    while len(frontier) > 0:
+        cost, node = frontier.pop(0)
+
 def preprocess():
     pass
 
 def main():
     chain = RobotChain([(2, 1), (0,0), (2,1)])
+    print(chain.get_state())
+    print()
+    for s in chain.get_successors():
+        print(s.get_state())
+    return None
+
     while True:
         print(chain)
         x = input()
