@@ -2,7 +2,8 @@
 # Day 22
 
 PRUNE = 16777216
-N_SECRETS = 10
+# Number of secrets, including initial
+N_SECRETS = 2000
 
 DUMMY = 0
 if DUMMY:
@@ -24,6 +25,7 @@ def get_next(secret):
     return secret
 
 def extract_sequence(value):
+    # First item in sequence
     sequence = [value % 10,]
     value = get_next(value)
     deltas = [None,]
@@ -31,6 +33,8 @@ def extract_sequence(value):
         sequence.append(value % 10)
         value = get_next(value)
         deltas.append(sequence[i] - sequence[i - 1])
+    #print(sequence)
+    #print(deltas)
     return sequence, deltas
 
 def extract_patterns(number):
@@ -49,11 +53,28 @@ def extract_patterns(number):
     return pattern_map
 
 def main():
-    result = 0
     numbers = get_initial_numbers()
-    numbers = [123,]
+    #numbers = [123,]
+    patterns = dict()
     for number in numbers:
-        print(extract_patterns(number))
+        print(f"Processing {number}...")
+        new_patterns = extract_patterns(number)
+        for k in new_patterns.keys():
+            if k in patterns.keys():
+                patterns[k].append(new_patterns[k])
+            else:
+                patterns[k] = [new_patterns[k],]
+    print(patterns)
+    maximum = 0
+    for v in patterns.values():
+        instance = 0
+        for num in v:
+            instance += num
+        if instance > maximum: maximum = instance
+
+    print(maximum)
+
+
     print(result)
 
 if __name__ == "__main__":
