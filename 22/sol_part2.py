@@ -3,7 +3,7 @@
 
 PRUNE = 16777216
 # Number of secrets, including initial
-N_SECRETS = 2000
+N_SECRETS = 2001 
 
 DUMMY = 0
 if DUMMY:
@@ -26,15 +26,17 @@ def get_next(secret):
 
 def extract_sequence(value):
     # First item in sequence
-    sequence = [value % 10,]
-    value = get_next(value)
+    sequence = [value,]
+    for i in range(0, N_SECRETS):
+        value = get_next(value)
+        sequence.append(value)
+    for i in range(0, len(sequence)):
+        sequence[i] = sequence[i] % 10
+
     deltas = [None,]
-    for i in range(1, N_SECRETS):
-        sequence.append(value % 10)
+    for i in range(1, len(sequence)):
         value = get_next(value)
         deltas.append(sequence[i] - sequence[i - 1])
-    #print(sequence)
-    #print(deltas)
     return sequence, deltas
 
 def extract_patterns(number):
@@ -46,15 +48,13 @@ def extract_patterns(number):
         # Get the next item in sequence
         pattern.pop(0)
         pattern.append(deltas[i])
-        # Detect loop - exit early
-        if tuple(pattern) in pattern_map.keys():
-            return pattern_map
-        pattern_map[tuple(pattern)] = sequence[i]
+        # Avoid duplicates
+        if tuple(pattern) not in pattern_map.keys():
+            pattern_map[tuple(pattern)] = sequence[i]
     return pattern_map
 
 def main():
     numbers = get_initial_numbers()
-    #numbers = [123,]
     patterns = dict()
     for number in numbers:
         print(f"Processing {number}...")
@@ -64,18 +64,16 @@ def main():
                 patterns[k].append(new_patterns[k])
             else:
                 patterns[k] = [new_patterns[k],]
-    print(patterns)
     maximum = 0
     for v in patterns.values():
         instance = 0
         for num in v:
             instance += num
         if instance > maximum: maximum = instance
-
     print(maximum)
 
 
-    print(result)
+
 
 if __name__ == "__main__":
     main()
