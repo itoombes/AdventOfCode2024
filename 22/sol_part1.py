@@ -1,7 +1,9 @@
 # itoombes, Advent of Code 2024
 # Day 22
 
-DUMMY = 1
+PRUNE = 16777216
+
+DUMMY = 0
 if DUMMY:
     INPUT = "dummy.txt"
 else:
@@ -14,13 +16,10 @@ def get_initial_numbers():
         numbers.append(int(line))
     return numbers
 
-def mix_and_prune(a, b):
-    return (a ^ b) % 16776216
-
 def get_next(secret):
-    secret = mix_and_prune(secret, secret * 64)
-    secret = mix_and_prune(secret, secret // 32)
-    secret = mix_and_prune(secret, secret * 2048)
+    secret = ((secret * 64) ^ secret) % PRUNE
+    secret = ((secret // 32) ^ secret) % PRUNE
+    secret = ((secret * 2048) ^ secret) % PRUNE
     return secret
 
 def main():
@@ -28,11 +27,11 @@ def main():
     numbers = get_initial_numbers()
     print(numbers)
     for number in numbers:
-        value = number
-        for i in range(0, 2001):
-            value = get_next(value)
-        print(f"{number} : {value}")
-        result += value 
+        init = number
+        for i in range(0, 2000):
+            number = get_next(number)
+        print(f"{init} : {number}")
+        result += number 
     print(result)
 
 if __name__ == "__main__":
