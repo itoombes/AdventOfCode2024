@@ -71,8 +71,8 @@ class RobotChain:
 
     def action(self, i = 0):
         # Don't want to apply last arm's action
-        if i == len(self._arms):
-            print("LAST ARM ACTION!")
+        if i == len(self._arms) - 1:
+            #print("LAST ARM ACTION!")
             return None
         action = ROBOT_PAD[self._arms[i]]
         if action == "A": return self.action(i + 1)
@@ -104,30 +104,26 @@ def cost_between_states(chain, state):
     visited.add(chain.get_state())
     while len(frontier) > 0:
         cost, node = frontier.pop(0)
+        print(f"{cost}, {node.get_state()}")
+        # Check if at desired end point
+        if node.get_state() == state:
+            return cost
+        # Get successors
+        cost += 1
+        for s in node.get_successors():
+            if s.get_state() in visited:
+                continue
+            visited.add(s.get_state())
+            frontier.append((cost, s))
+    return None
 
 def preprocess():
+    # Desired states
     pass
 
 def main():
     chain = RobotChain([(2, 1), (0,0), (2,1)])
-    print(chain.get_state())
-    print()
-    for s in chain.get_successors():
-        print(s.get_state())
-    return None
-
-    while True:
-        print(chain)
-        x = input()
-        if x == ",": nchain = chain.move_up()
-        elif x == "a": nchain = chain.move_left()
-        elif x == "o": nchain = chain.move_down()
-        elif x == "e": nchain = chain.move_right()
-        elif x == ".": nchain = chain.action()
-        if nchain is not None:
-            chain = nchain
-        else:
-            print("Illegal move")
+    print(cost_between_states(chain, ((2, 1), (0, 0), (0, 0))))
 
 if __name__ == "__main__":
     main()
