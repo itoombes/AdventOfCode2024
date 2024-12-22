@@ -1,7 +1,8 @@
-# itoombes, Advent of Code
-# Day 21 Part 2
+# itoombes, Advent of Code 2024
+# Day 21
 
-import copy
+import heapq
+
 #   ^ A
 # < v >
 ROBOT_PAD = {(0, 0) : "<",
@@ -41,91 +42,74 @@ def extract_number(sequence):
         string += c
     return int(string)
 
-class RobotChain:
-    def __init__(self, arms):
-        self._arms = arms
-
-    def move_up(self, i = 0):
-        x, y = self._arms[i]
-        if (x, y + 1) in ROBOT_PAD.keys():
-            return RobotChain(self._arms[:i] + [(x, y + 1),] + self._arms[i + 1:])
-        return None
-
-    def move_left(self, i = 0):
-        x, y = self._arms[i]
-        if (x - 1, y) in ROBOT_PAD.keys():
-            return RobotChain(self._arms[:i] + [(x - 1, y),] + self._arms[i + 1:])
-        return None
-
-    def move_down(self, i = 0):
-        x, y = self._arms[i]
-        if (x, y - 1) in ROBOT_PAD.keys():
-            return RobotChain(self._arms[:i] + [(x, y - 1),] + self._arms[i + 1:])
-        return None
-
-    def move_right(self, i = 0):
-        x, y = self._arms[i]
-        if (x + 1, y) in ROBOT_PAD.keys():
-            return RobotChain(self._arms[:i] + [(x + 1, y),] + self._arms[i + 1:])
-        return None
-
-    def action(self, i = 0):
-        # Don't want to apply last arm's action
-        if i == len(self._arms) - 1:
-            #print("LAST ARM ACTION!")
-            return None
-        action = ROBOT_PAD[self._arms[i]]
-        if action == "A": return self.action(i + 1)
-        elif action == "^": return self.move_up(i + 1)
-        elif action == "<": return self.move_left(i + 1)
-        elif action == "v": return self.move_down(i + 1)
-        elif action == ">": return self.move_right(i + 1)
-    
-    def __str__(self):
-        return str(self._arms)
-
-    def get_state(self):
-        return tuple(self._arms)
-
-    def __eq__(self, other):
-        return self.get_state() == other.get_state()
-
-    def get_successors(self):
-        candidates = (self.move_up(), self.move_down(), self.move_right(), self.move_left(), self.action())
-        successors = list()
-        for c in candidates:
-            if c is not None:
-                successors.append(c)
-        return successors
-
-def cost_between_states(chain, state):
-    frontier = [(0, chain),]
-    visited = set()
-    visited.add(chain.get_state())
+def cost_between_arm_positions(transition_costs, init_state, target_state, valid_states):
+    # (<state>, <upper arm action>)
+    frontier = [(0, (init_state, "A")),]
+    heapq.heapify(frontier)
+    visited = {(init_state, "A") : 0}
     while len(frontier) > 0:
-        cost, node = frontier.pop(0)
-        print(f"{cost}, {node.get_state()}")
-        # Check if at desired end point
-        if node.get_state() == state:
-            return cost
-        # Get successors
-        cost += 1
-        for s in node.get_successors():
-            if s.get_state() in visited:
-                continue
-            visited.add(s.get_state())
-            frontier.append((cost, s))
-    return None
+        cost, node = heapq.heappop(frontier)
+        arm, control = node
+        print(f"{cost} : {arm}, {control}")
+        # Check if state is goal
+        if control == "A" and arm == target_state:
+            return visited[(arm, "A")]
+        # Generate successors
+        # Storing in (<position>, <action>, <cost increment>)
+        successors = list()
+        x, y = arm
+        if control == "<":
+            successors.append(((x, y), "^", transition_costs["<"]["^"]))
+            successors.append(((x, y), "v", transition_costs["<"]["v"]))
+            successors.append(((x, y), "A", transition_costs["<"]["A"]))
+            x -= 1
+        elif control == ">":
+            successors.append(((x, y), "^", transition_costs[">"]["^"]))
+            successors.append(((x, y), "v", transition_costs[">"]["v"]))
+            successors.append(((x, y), "A", transition_costs[">"]["A"]))
+            x += 1
+        elif control == "^":
+            successors.append(((x, y), "<", transition_costs["^"]["<"]))
+            successors.append(((x, y), ">", transition_costs["^"][">"]))
+            successors.append(((x, y), "A", transition_costs["^"]["A"]))
+            y += 1
+        elif control == "v":
+            successors.append(((x, y), "<", transition_costs["v"]["<"]))
+            successors.append(((x, y), ">", transition_costs["v"][">"]))
+            successors.append(((x, y), "A", transition_costs["v"]["A"]))
+            y -= 1
+        elif control == "A":
+            successors.append(((x, y), "^", transition_costs["A"]["^"]))
+            successors.append(((x, y), "v", transition_costs["A"]["v"]))
+            successors.append(((x, y), "<", transition_costs["A"]["<"]))
+            successors.append(((x, y), ">", transition_costs["A"][">"]))
+        # Ensure motion is valid
+        if (x, y) in valid_states.keys() and control != "A":
+            successors.append(((x, y), control, 1))
+        # Add unvisited or lesser path cost successors to frontier
+        for nextPos, nextControl, costInc in successors:
+            nextNode = (nextPos, nextControl)
+            nextCost = cost + costInc
+            if nextNode not in visited or nextCost < visited[nextNode]:
+                visited[nextNode] = nextCost
+                heapq.heappush(frontier, (nextCost, nextNode))
 
-def preprocess():
-    # Desired states
-    pass
+def process_transition_costs(depth):
+    # Get the number of actions required to get to a "<action>, <action>, <BUTTON>" state
+    # Start with depth 0 -- user controlled, no cost to change button
+    transition_costs = {"A": {"^" : 0, "<" : 0, ">" : 0, "v" : 0},
+                        "^" : {"<" : 0, ">" : 0, "A" : 0},
+                        "v" : {"<" : 0, ">" : 0, "A" : 0},
+                        "<" : {"^" : 0, "v" : 0, "A" : 0},
+                        ">" : {"^" : 0, "v" : 0, "A" : 0}}
+    print(cost_between_arm_positions(transition_costs, (2, 1), (0, 0), ROBOT_PAD))
+
+    i = 1
+
 
 def main():
-    chain = RobotChain([(2, 1),] * 10)
-    target = [(2, 1),] * 9 + [(0, 0),]
-    target = tuple(target)
-    print(cost_between_states(chain, target)) 
+    costs = process_transition_costs(1)
+    print(costs)
 
 if __name__ == "__main__":
     main()
