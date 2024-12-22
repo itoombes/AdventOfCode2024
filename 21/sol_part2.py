@@ -26,6 +26,10 @@ KEYPAD = {(1, 0) : "0",
           (1, 3) : "8",
           (2, 3) : "9"}
 
+KEYPAD_INV = {}
+for k, v in KEYPAD.items():
+    KEYPAD_INV[v] = k
+
 def read_sequences():
     f = open("input.txt", "r")
     sequences = list()
@@ -151,10 +155,27 @@ def process_transition_costs(depth):
 
     return transition_costs
 
+def solve_sequence(sequence, transition_costs):
+    cost = 0
+    node = KEYPAD_INV["A"]
+    for c in sequence:
+        nextNode = KEYPAD_INV[c]
+        # Cost is price to move + price to press button
+        cost += min_cost(transition_costs, node, nextNode, KEYPAD) + 1
+        node = nextNode
+    return cost
+
 
 def main():
-    costs = process_transition_costs(1)
-    print(costs)
+    transition_costs = process_transition_costs(1)
+    complexity = 0
+    for sequence in read_sequences():
+        cost = solve_sequence(sequence, transition_costs)
+        print(f"{sequence} : {cost}")
+        input()
+        complexity += extract_number(sequence) * cost
+    print(complexity)
+
 
 if __name__ == "__main__":
     main()
