@@ -3,7 +3,7 @@
 
 import copy
 
-DUMMY = 1
+DUMMY = 0
 if DUMMY:
     INPUT = "dummy.txt"
 else:
@@ -42,14 +42,28 @@ def extract_groups(graph, groupsize):
                         groups[v].add(nextGroup)
     return groups
 
-        
+def filter_groups(toFilter):
+    groups = set()
+    for node in toFilter:
+        start, otherGroups = node
+        for two, three in otherGroups:
+            nextGroup = [start, two, three]
+            nextGroup.sort()
+            nextGroup = tuple(nextGroup)
+            if nextGroup not in groups:
+                groups.add(nextGroup)
+    return groups
 
 def main():
     graph = read_graph()
     groups = extract_groups(graph, 3)
-    for i in ("aq","co","de","kh","qp", "tb", "tc", "td", "ub"):
-        for v in groups[i]:
-            print(f"{i},{v[0]},{v[1]}")
+    validify = list()
+    for v in graph.keys():
+        if v[0] == "t":
+            validify.append((v, groups[v]))
+    valid_groups = filter_groups(validify)
+    print(valid_groups)
+    print(len(valid_groups))
 
 if __name__ == "__main__":
     main()
