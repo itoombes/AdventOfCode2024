@@ -24,6 +24,12 @@ def read_graph():
         graph[b].add(a)
     return graph
 
+def check_connectivity(graph, existing_group, vertex):
+    for v in existing_group:
+        if vertex not in graph[v]:
+            return False
+    return True
+
 def build_connections(graph):
     vertices = list(graph.keys())
     print(vertices)
@@ -34,10 +40,8 @@ def build_connections(graph):
         subgraph.add(frontier[0])
         while len(frontier) > 0:
             v = frontier.pop(0)
-            print(v)
             for s in graph[v]:
-                print(f"\t{s}")
-                if s not in subgraph:
+                if s not in subgraph and check_connectivity(graph, subgraph, s):
                     subgraph.add(s)
                     frontier.append(s)
                     vertices.remove(s)
