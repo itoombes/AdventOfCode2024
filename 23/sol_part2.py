@@ -3,7 +3,7 @@
 
 import copy
 
-DUMMY = 1
+DUMMY = 0
 if DUMMY:
     INPUT = "dummy.txt"
 else:
@@ -31,6 +31,7 @@ def check_connectivity(graph, existing_group, vertex):
     return True
 
 def build_connections(graph):
+    # Note - does return duplicates, but not a big deal as just extracting longest
     vertices = list(graph.keys())
     print(vertices)
     connections = list()
@@ -44,7 +45,6 @@ def build_connections(graph):
                 if s not in subgraph and check_connectivity(graph, subgraph, s):
                     subgraph.add(s)
                     frontier.append(s)
-                    vertices.remove(s)
         print(subgraph)
         connections.append(subgraph)
     return connections
@@ -55,6 +55,19 @@ def build_connections(graph):
 def main():
     graph = read_graph()
     subgraphs = build_connections(graph)
+    maximum = 0
+    maxgraph = None
+    for s in subgraphs:
+        if len(s) > maximum:
+            maximum = len(s)
+            maxgraph = s
+    print(maxgraph)
+    maxgraph = list(maxgraph)
+    maxgraph.sort()
+    password = ""
+    for computer in maxgraph:
+        password += f"{computer},"
+    print(password[:-1])
 
 if __name__ == "__main__":
     main()
