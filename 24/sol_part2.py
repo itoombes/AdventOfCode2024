@@ -79,50 +79,42 @@ def extract_z_values(values):
         values[zed] = b
     return values
 
-def confirm_valid(values, predicates, cache, outputs):
-    # Set the cached values
-    for i in cache.keys():
-        if outputs[i][0] == "z" and cache[i] != values[outputs[i]]:
-            return False
-        else:
-            values[outputs[i]] = cache[i]
-    # 
-
-
-def permutations(number):
-    # Generate every swap index
-    pairs = list()
-    for i in range(0, number - 1):
-        for j in range(i + 1, number):
-            pairs.append((i, j))
-
-    swaps = list()
-    for i in range(0, len(pairs) - 3):
-        print(i)
-        for j in range(i, len(pairs) - 2):
-            print(f"\t{j}")
-            for k in range(j, len(pairs) - 1):
-                print(f"\t{k}")
-                for l in range(k, len(pairs)):
-                    print(f"\t{l}")
-                    swaps.append((pairs[i][0], pairs[i][1],
-                                  pairs[j][0], pairs[j][1],
-                                  pairs[k][0], pairs[k][1],
-                                  pairs[l][0], pairs[l][1]))
-                    
-    print(pairs)
+def check_valid(values, predicates):
+    return True 
 
 def main():
     # Extract data from files
     setValues = parse_init_values()
     setValues = extract_z_values(setValues)
-    predicates = parse_predicates()
-    cache, variablePredicates, outputs = sort_predicates(setValues, predicates)
-    # Generate permutations
-    for perm in permutations(len(predicates)):
+    setPredicates = parse_predicates()
+    while True:
         values = copy.deepcopy(setValues)
-        variablePredicates = copy.deepcopy(variablePredicates)
-        print(perm)
+        predicates = copy.deepcopy(setPredicates)
+        print("Input wires to swap:")
+        swapMem = list()
+        for i in range(1, 5):
+            while True:
+                try:
+                    swap1, swap2 = input().split()
+                    swap1 = int(swap1)
+                    swap2 = int(swap2)
+                    in11, in12, gate1, out1 = predicates[swap1]
+                    in21, in22, gate2, out2 = predicates[swap2]
+                    predicates[swap1] = (in11, in12, gate1, out2)
+                    predicates[swap2] = (in21, in22, gate2, out1)
+                    print(f"Swap {i} successful!")
+                    swapMem.append((swap1, swap2))
+                except:
+                    print("Illegal swap attempt! Try again.")
+                    continue
+                break
+        print("All swaps complete")
+                
+
+        if check_valid(values, predicates):
+            print("Valid!")
+            for swap in swapMem:
+                print(f"{swap[0]}, {swap[1]}")
 
 if __name__ == "__main__":
     main()
