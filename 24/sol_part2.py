@@ -74,8 +74,12 @@ def check_valid(values, predicates, expected, zValues):
         if k[0] == "z" and int(zValues[k]) != int(values[k]):
             print(f"{values[k]}, {zValues[k]}")
             failZ.append(k)
-    for p in initPredicates:
+    for i, p in enumerate(initPredicates):
         in1, in2, gate, out = p
+        string = f"{str(i + 1001)[1:]} : {in1} {gate} {in2} -> {out}"
+        if in1 in failZ or in2 in failZ or out in failZ:
+            string = "\033[0;31m" + string + "\033[0m"
+        print(string)
             
 
 
