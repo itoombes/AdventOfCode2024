@@ -74,12 +74,19 @@ def check_valid(values, predicates, expected, zValues):
         if k[0] == "z" and int(zValues[k]) != int(values[k]):
             print(f"{values[k]}, {zValues[k]}")
             failZ.append(k)
+    invalidPredicates = list()
     for i, p in enumerate(initPredicates):
         in1, in2, gate, out = p
-        string = f"{str(i + 1001)[1:]} : {in1} {gate} {in2} -> {out}"
+        string = f"{str(i + 1001)[1:]}: {in1} {gate} {in2} -> {out}"
         if in1 in failZ or in2 in failZ or out in failZ:
             string = "\033[0;31m" + string + "\033[0m"
+            invalidPredicates.append((string, values[in1], values[in2], gate, values[out]))
         print(string)
+    print()
+    for s, in1, in2, gate, out in invalidPredicates:
+        print(s)
+        print(f"      {in1}  {gate}  {in2}  -->  {out}")
+
             
 
 
@@ -94,7 +101,7 @@ def main():
         predicates = copy.deepcopy(setPredicates)
         print("Input wires to swap:")
         swapMem = list()
-        for i in range(1, 1):
+        for i in range(1, 5):
             while True:
                 try:
                     swap1, swap2 = input().split()
@@ -110,15 +117,11 @@ def main():
                     print("Illegal swap attempt! Try again.")
                     continue
                 break
-        print("All swaps complete")
-                
-
-        print(predicates)
-        input()
         if check_valid(values, predicates, expected, zValues):
             print("Valid!")
             for swap in swapMem:
                 print(f"{swap[0]}, {swap[1]}")
+            exit()
 
 if __name__ == "__main__":
     main()
