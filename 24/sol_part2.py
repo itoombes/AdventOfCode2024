@@ -41,18 +41,34 @@ def parse_predicates():
     return predicates
 
 def apply_predicates(values, predicates):
-    while len(predicates) > 0:
-        in1, in2, gate, out = predicates.pop(0)
-        if in1 not in values.keys() or in2 not in values.keys():
-            predicates.append((in1, in2, gate, out))
-            continue
-        if gate == "AND":
-            values[out] = values[in1] & values[in2]
-        elif gate == "XOR":
-            values[out] = values[in1] ^ values[in2]
-        elif gate == "OR":
-            values[out] = values[in1] | values[in2]
-    return values
+    variablePredicates = list()
+    setCache = dict()
+    keys = values.keys()
+    for i, p in enumerate(predicates):
+        in1, gate, in2, out = p
+        if in1 in keys and in2 in keys:
+            if gate == "AND":
+                setCache[i] = values[in1] & values[in2]
+            elif gate == "OR":
+                setCache[i] == values[in1] | values[in2]
+            elif gate == "XOR":
+                setCache[i] == values[in1] ^ values[in2]
+        elif in1 in keys:
+            if values[in1] == 1 and gate == "OR":
+                setCache[i] = 1
+            elif gate == "AND":
+                setCache[i] = 0
+        elif in2 in keys:
+            if values[in2] == 1 and gate == "OR":
+                setPredicates.append(i)
+                setCache[i] = 1
+            elif gate == "AND":
+                setCache[i] = 0
+        else:
+            variablePredicates.append(i)
+    print(variablePredicates)
+    print(setCache)
+    
 
 def extract_z_values(values):
     expected = parse_expected_out(values)
@@ -63,11 +79,11 @@ def extract_z_values(values):
     return values
 
 def main():
-    values = parse_init_values()
-    expected = parse_expected_out(values)
-    print(bin(expected))
-    print(extract_z_values(values))
-    
+    setValues = parse_init_values()
+    setValues = extract_z_values(setValues)
+    print(setValues)
+    apply_predicates(setValues, parse_predicates())
+
 
 if __name__ == "__main__":
     main()
