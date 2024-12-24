@@ -3,7 +3,7 @@
 
 import copy
 
-TEST = 1
+TEST = 0
 if TEST:
     VALUES = "test3.txt"
     PREDICATES = "test4.txt"
@@ -29,7 +29,7 @@ def parse_expected_out(values):
                 nBits = int(k[1:]) + 1
         elif k[0] == "y":
             y |= (values[k] << int(k[1:]))
-    return (x + y) & (2 ** nBits - 1)
+    return x + y
 
 def parse_predicates():
     f = open(PREDICATES, "r")
@@ -54,41 +54,19 @@ def apply_predicates(values, predicates):
             values[out] = values[in1] | values[in2]
     return values
 
+def extract_z_values(values):
+    expected = parse_expected_out(values)
+    nZ = len(bin(expected)) - 3 + 100 # Want two digit with leading zeros
+    for i, b in enumerate(bin(expected)[2:]):
+        zed = "z" + str(nZ - i)[1:]
+        values[zed] = b
+    return values
+
 def main():
     values = parse_init_values()
     expected = parse_expected_out(values)
-    predicates = parse_predicates()
-    # Generate all pairs of predicates
-    pairs = list()
-    for i in range(0, len(predicates) - 1):
-        for j in range(i + 1, len(predicates)):
-            pairs.append((i, j))
-    # Generate all groups of four pairs
-    swapgroups = list()
-    for i in range(0, len(pairs) - 3):
-        for j in range(i + 1, len(pairs) - 2):
-            for k in range(j + 1, len(pairs) - 1):
-                for l in range(k + 1, len(pairs)):
-                    swapgroups.append((i, j, k, l))
-    #print(swapgroups)
-    # Go thru every group of four
-    while len(swapgroups) > 0:
-        predVar = copy.deepcopy(predicates)
-        valVar = copy.deepcopy(values)
-        swaps = swapgroups.pop(0)
-        for ip in swaps:
-            in11, in12, gate1, out1 = predVar[pairs[ip][0]]
-            in21, in22, gate2, out2 = predVar[pairs[ip][1]]
-            predVar[pairs[ip][0]] = (in11, in12, gate1, out2)
-            predVar[pairs[ip][1]] = (in21, in22, gate2, out1)
-        outValues = apply_predicates(valVar, predVar)
-        out = 0
-        for k in outValues.keys():
-            if k[0] == "z":
-                out = out | (outValues[k] << int(k[1:]))
-        if out == expected:
-            print(swaps)
-
+    print(bin(expected))
+    print(extract_z_values(values))
     
 
 if __name__ == "__main__":
