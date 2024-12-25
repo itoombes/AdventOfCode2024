@@ -107,6 +107,7 @@ def check_valid(values, predicates, expected, zValues):
     print()
     for s in notablePredicates:
         print(s)
+    print(f"# Incorrect : {len(failZ)}")
 
 def main():
     # Extract data from files
