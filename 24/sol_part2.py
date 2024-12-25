@@ -18,6 +18,15 @@ def parse_init_values():
         values[line[0:3]] = int(line[-2:-1])
     return values
 
+def parse_predicates():
+    f = open(PREDICATES, "r")
+    predicates = list()
+    for line in f.readlines():
+        line = line.replace("\n", "")
+        in1, gate, in2, _, out = line.split(" ")
+        predicates.append((in1, in2, gate, out))
+    return predicates
+
 def parse_expected_out(values):
     x = 0
     y = 0
@@ -31,15 +40,6 @@ def parse_expected_out(values):
             y |= (values[k] << int(k[1:]))
     return x + y
 
-def parse_predicates():
-    f = open(PREDICATES, "r")
-    predicates = list()
-    for line in f.readlines():
-        line = line.replace("\n", "")
-        in1, gate, in2, _, out = line.split(" ")
-        predicates.append((in1, in2, gate, out))
-    return predicates
-
 def extract_z_values(values):
     zValues = dict()
     expected = parse_expected_out(values)
@@ -48,6 +48,18 @@ def extract_z_values(values):
         zed = "z" + str(nZ - i)[1:]
         zValues[zed] = b
     return zValues
+
+def extract_base_predicates(values, predicates):
+    for i, p in enumerate(predicates):
+        in1, in2, gate, out = p
+        if in1 in values.keys() and in2 in values.keys():
+            if gate == "AND":
+                out = values[in1] & values[in2]
+            elif gate == "OR":
+                out = values[in1] | values[in2]
+            elif gate == "XOR":
+                out = values[in1] ^ values[in2]
+            print(f"{i + 1} : {out}")
 
 def check_valid(values, predicates, expected, zValues):
     initValues = copy.deepcopy(values)
@@ -74,21 +86,27 @@ def check_valid(values, predicates, expected, zValues):
         if k[0] == "z" and int(zValues[k]) != int(values[k]):
             print(f"{values[k]}, {zValues[k]}")
             failZ.append(k)
-    invalidPredicates = list()
+    notablePredicates = list()
     for i, p in enumerate(initPredicates):
         in1, in2, gate, out = p
+        if gate == "AND":
+            gate = "&"
+        elif gate == "OR":
+            gate = "|"
+        elif gate == "XOR":
+            gate = "^"
         string = f"{str(i + 1001)[1:]}: {in1} {gate} {in2} -> {out}"
+        string += f" | {values[in1]} {gate} {values[in2]} -> {values[out]}"
         if in1 in failZ or in2 in failZ or out in failZ:
             string = "\033[0;31m" + string + "\033[0m"
-            invalidPredicates.append((string, values[in1], values[in2], gate, values[out]))
+            notablePredicates.append(string)
+        elif in1[0] == "z" or in2[0] == "z" or out[0] == "z":
+            string = "\033[0;32m" + string + "\033[0m"
+            notablePredicates.append(string)
         print(string)
     print()
-    for s, in1, in2, gate, out in invalidPredicates:
+    for s in notablePredicates:
         print(s)
-        print(f"      {in1}  {gate}  {in2}  -->  {out}")
-
-            
-
 
 def main():
     # Extract data from files
@@ -96,6 +114,7 @@ def main():
     zValues = extract_z_values(setValues)
     expected = parse_expected_out(setValues) 
     setPredicates = parse_predicates()
+    extract_base_predicates(setValues, setPredicates)
     while True:
         values = copy.deepcopy(setValues)
         predicates = copy.deepcopy(setPredicates)
@@ -104,9 +123,11 @@ def main():
         for i in range(1, 5):
             while True:
                 try:
-                    swap1, swap2 = input().split()
-                    swap1 = int(swap1) + 1 # Using LINE NUMBER, not index
-                    swap2 = int(swap2) + 1
+                    userInput = input()
+                    swap1, swap2 = userInput.split(" ")
+                    # Exit early
+                    swap1 = int(swap1) - 1 # Using LINE NUMBER, not index
+                    swap2 = int(swap2) - 1
                     in11, in12, gate1, out1 = predicates[swap1]
                     in21, in22, gate2, out2 = predicates[swap2]
                     predicates[swap1] = (in11, in12, gate1, out2)
@@ -114,6 +135,8 @@ def main():
                     print(f"Swap {i} successful!")
                     swapMem.append((swap1, swap2))
                 except:
+                    if userInput == "q" or userInput == "Q":
+                        exit()
                     print("Illegal swap attempt! Try again.")
                     continue
                 break
