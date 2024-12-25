@@ -9,7 +9,7 @@ PREDICATES = "input2.txt"
 def parse_init_values(x, y):
     values = dict()
     nBits = 45
-    for i in range(0, len(nBits)):
+    for i in range(0, nBits):
         index = i + 100
         xKey = "x" + str(index)[1:]
         yKey = "y" + str(index)[1:]
@@ -37,6 +37,7 @@ def parse_expected_out(values):
                 nBits = int(k[1:]) + 1
         elif k[0] == "y":
             y |= (values[k] << int(k[1:]))
+    print(f"x : {x}, y : {y}")
     return x + y
 
 def extract_z_values(values):
@@ -84,24 +85,28 @@ def check_valid(values, predicates, expected, zValues):
             gate = "^"
         string = f"{str(i + 1001)[1:]}: {in1} {gate} {in2} -> {out}"
         string += f" | {values[in1]} {gate} {values[in2]} -> {values[out]}"
-        if in1 in failZ or in2 in failZ or out in failZ:
+        if out in failZ:
             string = "\033[0;31m" + string + "\033[0m"
             notablePredicates.append(string)
-        elif in1[0] == "z" or in2[0] == "z" or out[0] == "z":
+        elif out[0] == "z":
             string = "\033[0;32m" + string + "\033[0m"
-            notablePredicates.append(string)
+            #notablePredicates.append(string)
         print(string)
     print()
     for s in notablePredicates:
         print(s)
     print(f"# Incorrect : {len(failZ)}")
+    return len(failZ)
 
 def main():
     # Extract data from files
-    values = parse_init_values()
+    predicates = parse_predicates()
+
+    # Confirm valid for (0, 0), (0, 1), (1, 0), (1, 1)
+    while True
+    values = parse_init_values(0, 0)
     zValues = extract_z_values(values)
     expected = parse_expected_out(values) 
-    predicates = parse_predicates()
     check_valid(values, predicates, expected, zValues)
 
 if __name__ == "__main__":
