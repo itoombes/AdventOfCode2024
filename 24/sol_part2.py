@@ -9,7 +9,7 @@ if TEST:
     PREDICATES = "test4.txt"
 else:
     VALUES = "input1.txt"
-    PREDICATES = "input2.txt"
+    PREDICATES = "manualinput.txt"
 
 def parse_init_values():
     f = open(VALUES, "r")
