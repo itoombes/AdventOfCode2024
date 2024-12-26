@@ -102,9 +102,9 @@ def main():
     # Extract data from files
     predicates = parse_predicates()
 
+    maxInput = (1 << 45) - 1
     # Confirm valid for (0, 0), (0, 1), (1, 0), (1, 1)
-    while True
-    values = parse_init_values(0, 0)
+    values = parse_init_values(maxInput, 1)
     zValues = extract_z_values(values)
     expected = parse_expected_out(values) 
     check_valid(values, predicates, expected, zValues)
