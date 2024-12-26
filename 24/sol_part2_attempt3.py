@@ -105,6 +105,15 @@ def main():
             if xL: progress += xLow + " "
             if yH: progress += yHigh + " "
             if yL: progress += yLow + " "
+            progress += ": "
+            failed = check_valid(values, initPredicates)
+            if len(failed) > 0:
+                progress += "\033[0;31m"
+                for z in failed:
+                    progress += f"{z} "
+                progress += "\033[0m"
+            else:
+                progress += "\033[0;32mPass!\033[0m"
             print(progress)
     # i = 45
         
